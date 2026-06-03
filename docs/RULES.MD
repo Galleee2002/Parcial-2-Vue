@@ -2,6 +2,8 @@
 
 Guía de arquitectura, convenciones y ejemplos para completar la consigna del [Trabajo Práctico.pdf](./Trabajo%20Pr%C3%A1ctico.pdf) usando **este repositorio** como base.
 
+**Enfoque obligatorio del proyecto:** diseño e implementación **mobile first** — diseñar primero para pantallas pequeñas y ampliar el layout en breakpoints mayores, para que la interfaz sea fácil de usar en celular y tablet (ver §10 y [STYLE-DESIGN.md](./STYLE-DESIGN.md)).
+
 ---
 
 ## 1. Objetivo de la consigna
@@ -13,7 +15,7 @@ Crear una aplicación web con **Vue 3** que permita:
 - Ver el detalle de una película seleccionada (título, descripción, año, póster y al menos un dato más).
 - Filtrar resultados (por ejemplo por género o clasificación por edades).
 - _(Extra)_ Agregar películas a favoritos con persistencia (`localStorage` o IndexedDB).
-- _(Extra)_ Interfaz **mobile first**.
+- _(Extra en PDF; **obligatorio en este repo**)_ Interfaz **mobile first** — priorizar usabilidad en móvil (touch, una columna, controles grandes).
 - _(Extra)_ Obtener datos con **`fetch`** contra [The Movie Database (TMDB)](https://developer.themoviedb.org/docs).
 
 **Entrega:** repositorio en GitHub, grupos de hasta 3 integrantes.
@@ -58,7 +60,7 @@ pnpm lint       # ESLint + oxlint
 | 3   | Detalle al seleccionar (título, sinopsis, año, póster, +dato) | Mínimo     | `MovieDetailView` + `GET /movie/{id}`                           |
 | 4   | Filtro (género o clasificación)                               | Mínimo     | `GET /discover/movie` o filtros en discover                     |
 | 5   | Botón “Agregar a favoritos” + almacenamiento                  | Extra      | Detalle + `useFavorites` + `localStorage`                       |
-| 6   | UI mobile first                                               | Extra      | Grid Vuetify en vistas y componentes                            |
+| 6   | UI **mobile first** (obligatorio en el repo)                  | Extra PDF  | Grid Vuetify, touch targets, una columna por defecto (§10)      |
 | 7   | Datos con `fetch` a TMDB                                      | Extra      | [src/services/tmdb.js](./src/services/tmdb.js) — **sin axios**  |
 
 ---
@@ -683,7 +685,9 @@ const list = computed(() => load())
 
 ---
 
-## 10. Vuetify y diseño mobile first
+## 10. Vuetify y diseño mobile first (obligatorio)
+
+Toda vista y componente debe diseñarse **primero para móvil** y luego escalar a pantallas más anchas. El objetivo es una interfaz **fácil de usar** con el pulgar: lectura clara, controles alcanzables y sin scroll horizontal innecesario.
 
 El proyecto ya usa grid responsive en [HomeView.vue](./src/views/HomeView.vue):
 
@@ -691,13 +695,18 @@ El proyecto ya usa grid responsive en [HomeView.vue](./src/views/HomeView.vue):
 <v-col cols="12" sm="12" md="6" lg="4">...</v-col>
 ```
 
-**Convenciones mobile first:**
+**Principio mobile first:** escribir estilos y props de grid para el viewport más pequeño; solo en `sm` / `md` / `lg` añadir columnas, márgenes o tipografía mayor. No diseñar en desktop y “achicar” después.
+
+**Convenciones obligatorias:**
 
 - Por defecto una columna: `cols="12"`.
 - A partir de `sm` / `md` / `lg`, más columnas en pantallas anchas.
-- Contenedor: `v-container` con padding automático.
+- Contenedor: `v-container` con padding automático; evitar anchos fijos que desborden en 320–390px.
 - Tarjetas: ancho completo en móvil; imágenes con `cover` y altura fija razonable.
-- Navegación: `v-app-bar` fija arriba; botones táctiles (`size="large"` si hace falta).
+- Navegación: `v-app-bar` fija arriba; botones y enlaces con **área táctil ≥ 48px** (`size="large"` en móvil si hace falta).
+- Formularios: `v-text-field` y `v-select` a ancho completo en móvil; acciones principales visibles sin zoom.
+- Detalle: apilar póster y texto en una columna (`cols="12"`); pasar a dos columnas desde `md`.
+- Probar en DevTools (vista móvil) antes de dar por cerrada una pantalla.
 
 **Componentes Vuetify sugeridos:**
 
@@ -714,15 +723,16 @@ El proyecto ya usa grid responsive en [HomeView.vue](./src/views/HomeView.vue):
 
 ## 11. Reglas del equipo (código)
 
-1. **UI en español**; nombres de variables, funciones y archivos de lógica en **inglés**.
-2. **Componentes:** archivos en PascalCase (`MovieCard.vue`).
-3. **Un solo lugar para HTTP:** `src/services/tmdb.js` con `fetch` nativo — no usar axios ni otras librerías HTTP salvo acuerdo explícito.
-4. **Estado en vistas:** `ref` / `computed`; lógica compartida en `composables/`.
-5. **No poner lógica de API en el template** — solo expresiones simples y bindings.
-6. **Secrets:** nunca commitear `.env`; sí `.env.example`.
-7. **Manejar siempre** `loading` y `error` en operaciones async.
-8. **Respetar** ESLint y Prettier (`pnpm lint`, format on save).
-9. **Commits:** mensajes claros; PR en GitHub según indique la cátedra.
+1. **Mobile first obligatorio:** layout, grid y componentes pensados primero para móvil; usabilidad táctil y legibilidad en pantallas pequeñas (detalle en §10 y STYLE-DESIGN).
+2. **UI en español**; nombres de variables, funciones y archivos de lógica en **inglés**.
+3. **Componentes:** archivos en PascalCase (`MovieCard.vue`).
+4. **Un solo lugar para HTTP:** `src/services/tmdb.js` con `fetch` nativo — no usar axios ni otras librerías HTTP salvo acuerdo explícito.
+5. **Estado en vistas:** `ref` / `computed`; lógica compartida en `composables/`.
+6. **No poner lógica de API en el template** — solo expresiones simples y bindings.
+7. **Secrets:** nunca commitear `.env`; sí `.env.example`.
+8. **Manejar siempre** `loading` y `error` en operaciones async.
+9. **Respetar** ESLint y Prettier (`pnpm lint`, format on save).
+10. **Commits:** mensajes claros; PR en GitHub según indique la cátedra.
 
 ---
 

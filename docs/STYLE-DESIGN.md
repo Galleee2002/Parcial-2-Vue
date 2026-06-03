@@ -2,21 +2,24 @@
 
 Guía visual de referencia para el trabajo práctico descrito en [Trabajo Práctico.pdf](./Trabajo%20Pr%C3%A1ctico.pdf) y la arquitectura de [RULES.MD](./RULES.MD).
 
-**Principio rector:** la paleta **blue-grey** de Material Design define fondos, textos y bordes; la paleta **red** resalta acciones importantes, errores y estados activos. El rojo no debe dominar la interfaz (objetivo: ~15–20 % de superficie acentuada).
+**Principios rectores:**
+
+1. **Mobile first (obligatorio):** diseñar e implementar primero para pantallas pequeñas; la interfaz debe ser **fácil de usar** en celular (una columna, controles táctiles grandes, sin desbordes horizontales). Escalar layout y tipografía solo desde breakpoints `sm` / `md` / `lg`.
+2. **Paleta:** la **blue-grey** de Material Design define fondos, textos y bordes; la **red** resalta acciones importantes, errores y estados activos. El rojo no debe dominar la interfaz (objetivo: ~15–20 % de superficie acentuada).
 
 ---
 
 ## 1. Propósito y alcance
 
-Este documento es la **fuente de verdad de diseño** antes y durante la implementación en código. Define tokens, uso por pantalla y convenciones Vuetify para que todo el equipo mantenga coherencia visual.
+Este documento es la **fuente de verdad de diseño** antes y durante la implementación en código. Define tokens, uso por pantalla y convenciones Vuetify para que todo el equipo mantenga coherencia visual y **usabilidad en móvil**.
 
 | Ámbito | Incluye | No incluye (por ahora) |
 |--------|---------|-------------------------|
-| Diseño | Colores, tipografía, espaciado, componentes Vuetify | Logo, favicon, ilustraciones custom |
+| Diseño | Colores, tipografía, espaciado, **mobile first**, componentes Vuetify | Logo, favicon, ilustraciones custom |
 | Implementación | Referencia de tema `createVuetify` para `src/main.js` | Instalación de dependencias ni cambios en `src/` |
 | Entrega | Alineación con requisitos del PDF y RULES | Commits ni push automáticos |
 
-**Stack asumido (RULES):** Vue 3, Vuetify 4, Vue Router 5, grid responsive mobile first, textos de UI en **español**.
+**Stack asumido (RULES):** Vue 3, Vuetify 4, Vue Router 5, grid responsive **mobile first obligatorio**, textos de UI en **español**.
 
 ---
 
@@ -149,6 +152,19 @@ export default createVuetify({
 - **Contenedor:** `v-container` con padding fluido; **16px** en móvil, **24px** desde `md`.
 - **Grid mobile first (RULES §10):** `cols="12"` → `sm="6"` → `md="4"` → `lg="3"` en listados de películas.
 
+### 5.1 Mobile first — usabilidad (obligatorio)
+
+| Criterio | Regla |
+|----------|--------|
+| Punto de partida | Maquetar y revisar en viewport ~375px antes que en desktop |
+| Columnas | Una columna por defecto; más columnas solo en `sm`+ |
+| Touch | Botones, enlaces del nav y CTA con altura mínima **48px** en móvil |
+| Formularios | Búsqueda y filtros a ancho completo; no campos estrechos que obliguen zoom |
+| Lectura | Sinopsis y metadata con `text-body-2` / `text-caption`; líneas no demasiado largas en móvil |
+| Imágenes | Pósters `cover` con altura acotada; no forzar scroll horizontal |
+| Detalle | Póster arriba, texto abajo en móvil; layout en dos columnas desde `md` |
+| Validación | Probar Home, detalle y favoritos en DevTools (móvil) antes de cerrar la vista |
+
 ---
 
 ## 6. Requisitos del PDF → decisiones de color
@@ -162,7 +178,7 @@ Vinculación entre consigna, pantalla y paleta.
 | 3 | Detalle (título, sinopsis, año, póster, +dato) | `MovieDetailView` | Textos secundarios, layout | Botón favoritos (extra 5) |
 | 4 | Filtro (género o clasificación) | `v-select` / `MovieFilters` | Panel y labels en blue-grey | Opción seleccionada: acento sutil opcional |
 | 5 | Favoritos + almacenamiento | Detalle + `FavoritesView` | Lista y vacío en text-secondary | CTA y badge favorito |
-| 6 | UI mobile first | Grid, `v-app-bar`, botones ≥ 48px | Estructura responsive neutra | Solo acentos táctiles críticos |
+| 6 | UI **mobile first** (obligatorio en el repo) | Grid, `v-app-bar`, botones ≥ 48px, §5.1 | Estructura responsive neutra | Solo acentos táctiles críticos |
 | 7 | Datos con `fetch` TMDB | Estados loading / error | `v-progress-circular color="blue-grey"` | `v-alert type="error"` |
 
 Flujo visual resumido:
@@ -265,8 +281,9 @@ Siempre mostrar **loading** y **error** en operaciones async:
 
 ## 9. Accesibilidad y UX
 
+- **Mobile first:** la experiencia de referencia es el teléfono; desktop amplía espacio, no redefine la jerarquía ni oculta acciones clave.
 - **Contraste:** `text-blue-grey-darken-4` sobre `#ECEFF1` / `#FFFFFF` cumple WCAG AA para cuerpo.
-- **Táctil (mobile first):** botones de detalle y navbar con altura mínima **48px** donde sea posible (`size="large"` en móvil).
+- **Táctil:** botones de detalle, favoritos y navbar con altura mínima **48px** en móvil (`size="large"` si hace falta); separación suficiente entre targets.
 - **Foco:** respetar anillo de foco de Vuetify; campos con `color="red"` en estado focused.
 - **Idioma:** etiquetas y mensajes en español; nombres de código en inglés (RULES §11).
 
@@ -275,6 +292,7 @@ Siempre mostrar **loading** y **error** en operaciones async:
 ## 10. Checklist de coherencia con la entrega
 
 - [ ] UI en español en todos los labels y alertas
+- [ ] **Mobile first:** probado en viewport móvil; touch ≥ 48px; sin scroll horizontal (§5.1)
 - [ ] Jerarquía: explorar (blue-grey) → acción importante (red)
 - [ ] Sin colores fuera de blue-grey/red salvo pósters TMDB
 - [ ] Grid mobile first según RULES §10
