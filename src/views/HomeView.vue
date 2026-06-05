@@ -1,37 +1,91 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { mockMovies } from '@/data/mockMovies'
+import {
+  fetchPopularMovies,
+  searchMovies,
+  fetchGenres,
+  discoverByGenre,
+} from '@/services/tmdb'
+import AppContainer from '@/components/AppContainer.vue'
 import MovieCard from '@/components/MovieCard.vue'
 import TopMovieCard from '@/components/TopMovieCard.vue'
+import { useFavorites } from '@/composables/useFavorites'
 
 const router = useRouter()
-const topMovies = mockMovies.slice(0, 10)
+const { load: loadFavorites } = useFavorites()
 
+const movies = ref([])
+const topMovies = ref([])
+const genres = ref([])
 const search = ref('')
 const selectedGenre = ref(null)
+const loading = ref(true)
+const error = ref(null)
 
 const carouselRef = ref(null)
 const showLeftFade = ref(false)
 const showRightFade = ref(false)
 
-const genreOptions = [
-  { title: 'Todos los géneros', value: null },
-  ...Array.from(new Set(mockMovies.map((movie) => movie.genre))).map((genre) => ({
-    title: genre,
-    value: genre,
-  })),
-]
+const genreOptions = ref([{ title: 'Todos los géneros', value: null }])
 
-const filteredMovies = computed(() => {
-  const query = search.value.trim().toLowerCase()
+function setError(err) {
+  error.value = err instanceof Error ? err.message : 'Error al cargar películas'
+}
 
-  return mockMovies.filter((movie) => {
-    const matchesSearch = query === '' || movie.title.toLowerCase().includes(query)
-    const matchesGenre = selectedGenre.value === null || movie.genre === selectedGenre.value
-    return matchesSearch && matchesGenre
-  })
-})
+async function loadPopular() {
+  const data = await fetchPopularMovies()
+  movies.value = data.results ?? []
+}
+
+async function loadTopMovies() {
+  const data = await fetchPopularMovies()
+  topMovies.value = (data.results ?? []).slice(0, 10)
+}
+
+async function loadGenres() {
+  const data = await fetchGenres()
+  genres.value = data.genres ?? []
+  genreOptions.value = [
+    { title: 'Todos los géneros', value: null },
+    ...genres.value.map((genre) => ({ title: genre.name, value: genre.id })),
+  ]
+}
+
+async function refreshMovies() {
+  loading.value = true
+  error.value = null
+
+  try {
+    const query = search.value.trim()
+    if (query) {
+      const data = await searchMovies(query)
+      movies.value = data.results ?? []
+      return
+    }
+
+    if (selectedGenre.value != null) {
+      const data = await discoverByGenre(selectedGenre.value)
+      movies.value = data.results ?? []
+      return
+    }
+
+    await loadPopular()
+  } catch (err) {
+    setError(err)
+    movies.value = []
+  } finally {
+    loading.value = false
+  }
+}
+
+async function onSearch() {
+  await refreshMovies()
+}
+
+async function onGenreChange() {
+  await refreshMovies()
+}
 
 function updateCarouselEdges() {
   const carousel = carouselRef.value
@@ -54,7 +108,20 @@ function onNavigate(id) {
   router.push({ name: 'movie-detail', params: { id } })
 }
 
-onMounted(() => {
+onMounted(async () => {
+  loading.value = true
+  error.value = null
+
+  try {
+    await Promise.all([loadTopMovies(), loadGenres(), loadPopular(), loadFavorites()])
+  } catch (err) {
+    setError(err)
+    movies.value = []
+    topMovies.value = []
+  } finally {
+    loading.value = false
+  }
+
   updateCarouselEdges()
   window.addEventListener('resize', updateCarouselEdges)
 })
@@ -65,7 +132,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <v-container class="py-6">
+  <AppContainer>
     <h1 class="text-h4 text-blue-grey-darken-4 mb-2">Películas populares</h1>
     <p class="text-body-1 text-blue-grey-darken-2 mb-6">
       Buscá películas por título, filtrá por género y agregá tus favoritas a Mi Lista.
@@ -80,6 +147,8 @@ onUnmounted(() => {
           variant="outlined"
           color="red"
           clearable
+          @keyup.enter="onSearch"
+          @click:clear="onSearch"
         />
       </v-col>
       <v-col cols="12" md="4">
@@ -92,11 +161,20 @@ onUnmounted(() => {
           variant="outlined"
           color="red"
           clearable
+          @update:model-value="onGenreChange"
         />
       </v-col>
     </v-row>
 
-    <section class="mb-8">
+    <v-row class="mb-2">
+      <v-col cols="12" class="d-flex justify-end">
+        <v-btn color="red" variant="flat" size="large" :loading="loading" @click="onSearch">
+          Buscar
+        </v-btn>
+      </v-col>
+    </v-row>
+
+    <section v-if="topMovies.length > 0" class="mb-8">
       <h2 class="text-h5 text-blue-grey-darken-4 mb-4">Top 10</h2>
 
       <div class="carousel-wrapper">
@@ -140,8 +218,20 @@ onUnmounted(() => {
       </div>
     </section>
 
+    <div v-if="loading" class="d-flex justify-center py-12">
+      <v-progress-circular indeterminate color="red" size="48" />
+    </div>
+
     <v-alert
-      v-if="filteredMovies.length === 0"
+      v-else-if="error"
+      type="error"
+      variant="tonal"
+      :text="error"
+      class="mb-4"
+    />
+
+    <v-alert
+      v-else-if="movies.length === 0"
       type="info"
       variant="tonal"
       color="blue-grey"
@@ -151,7 +241,7 @@ onUnmounted(() => {
 
     <v-row v-else>
       <v-col
-        v-for="movie in filteredMovies"
+        v-for="movie in movies"
         :key="movie.id"
         cols="12"
         sm="6"
@@ -161,7 +251,7 @@ onUnmounted(() => {
         <MovieCard :movie="movie" />
       </v-col>
     </v-row>
-  </v-container>
+  </AppContainer>
 </template>
 
 <style scoped>

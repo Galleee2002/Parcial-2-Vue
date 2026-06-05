@@ -1,4 +1,7 @@
 <script setup>
+import { computed } from 'vue'
+import { posterUrl, releaseYear } from '@/services/tmdb'
+
 const props = defineProps({
   movie: {
     type: Object,
@@ -8,10 +11,8 @@ const props = defineProps({
 
 const emit = defineEmits(['navigate'])
 
-function getYear(releaseDate) {
-  if (!releaseDate) return ''
-  return releaseDate.slice(0, 4)
-}
+const posterSrc = computed(() => posterUrl(props.movie.poster_path))
+const year = computed(() => releaseYear(props.movie.release_date) ?? '')
 
 function onClick() {
   emit('navigate', props.movie.id)
@@ -20,12 +21,18 @@ function onClick() {
 
 <template>
   <v-card class="top-movie-card" elevation="2" rounded="lg" @click="onClick">
-    <v-img :src="movie.poster_path" :alt="movie.title" height="200" cover />
+    <v-img
+      v-if="posterSrc"
+      :src="posterSrc"
+      :alt="movie.title"
+      height="200"
+      cover
+    />
     <v-card-title class="top-movie-title text-blue-grey-darken-4 px-3 pt-2 pb-0">
       {{ movie.title }}
     </v-card-title>
-    <v-card-subtitle class="top-movie-year px-3 pb-2 text-blue-grey-darken-2">
-      {{ getYear(movie.release_date) }}
+    <v-card-subtitle v-if="year" class="top-movie-year px-3 pb-2 text-blue-grey-darken-2">
+      {{ year }}
     </v-card-subtitle>
   </v-card>
 </template>
