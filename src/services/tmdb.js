@@ -2,11 +2,21 @@ const BASE = 'https://api.themoviedb.org/3'
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY
 
 const POSTER_BASE = 'https://image.tmdb.org/t/p/w500'
+const PROVIDER_LOGO_BASE = 'https://image.tmdb.org/t/p/w92'
+
+/** Región ISO 3166-1 por defecto para plataformas de streaming */
+export const DEFAULT_WATCH_REGION = 'AR'
 
 /** Construye URL de imagen de póster */
 export function posterUrl(posterPath) {
   if (!posterPath) return null
   return `${POSTER_BASE}${posterPath}`
+}
+
+/** Construye URL del logo de una plataforma (watch provider) */
+export function providerLogoUrl(logoPath) {
+  if (!logoPath) return null
+  return `${PROVIDER_LOGO_BASE}${logoPath}`
 }
 
 /** Año desde release_date (formato TMDB: YYYY-MM-DD) */
@@ -55,9 +65,35 @@ export function searchMovies(query, page = 1) {
   return tmdbGet('/search/movie', { query: q, page })
 }
 
-/** Requisito 3 — detalle de película */
-export function fetchMovieDetails(id) {
-  return tmdbGet(`/movie/${id}`)
+/** Requisito 3 — detalle de película (incluye plataformas vía append_to_response) */
+export function fetchMovieDetails(id, watchRegion = DEFAULT_WATCH_REGION) {
+  return tmdbGet(`/movie/${id}`, {
+    append_to_response: 'watch/providers',
+    watch_region: watchRegion,
+  })
+}
+
+/** Plataformas donde ver la película (streaming, alquiler y compra) */
+export function fetchMovieWatchProviders(id, watchRegion = DEFAULT_WATCH_REGION) {
+  return tmdbGet(`/movie/${id}/watch/providers`, { watch_region: watchRegion })
+}
+
+/**
+ * Extrae proveedores por región desde la respuesta de watch/providers
+ * o desde el objeto anidado en fetchMovieDetails (clave "watch/providers").
+ */
+export function providersForRegion(watchData, region = DEFAULT_WATCH_REGION) {
+  const payload = watchData?.['watch/providers'] ?? watchData
+  const country = payload?.results?.[region]
+  if (!country) {
+    return { flatrate: [], rent: [], buy: [], link: null }
+  }
+  return {
+    flatrate: country.flatrate ?? [],
+    rent: country.rent ?? [],
+    buy: country.buy ?? [],
+    link: country.link ?? null,
+  }
 }
 
 /** Requisito 4 — filtro por género (discover) */

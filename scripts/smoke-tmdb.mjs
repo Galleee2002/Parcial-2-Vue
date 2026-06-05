@@ -43,11 +43,19 @@ try {
 
   const detail = await tmdb.fetchMovieDetails(11)
   console.assert(detail.title && detail.overview && detail.release_date, 'fetchMovieDetails: campos faltantes')
+  console.assert(detail['watch/providers']?.results, 'fetchMovieDetails: sin watch/providers')
+
+  const watch = await tmdb.fetchMovieWatchProviders(11)
+  console.assert(watch.results, 'fetchMovieWatchProviders: sin results')
+
+  const providers = tmdb.providersForRegion(watch)
+  console.assert(Array.isArray(providers.flatrate), 'providersForRegion: flatrate no es array')
 
   console.assert(tmdb.posterUrl('/test.jpg')?.includes('w500'), 'posterUrl')
+  console.assert(tmdb.providerLogoUrl('/test.jpg')?.includes('w92'), 'providerLogoUrl')
   console.assert(tmdb.releaseYear('1977-05-25') === '1977', 'releaseYear')
 
-  console.log('OK: smoke test TMDB pasó (5 endpoints + helpers)')
+  console.log('OK: smoke test TMDB pasó (6 endpoints + helpers)')
 } finally {
   await server.close()
 }
