@@ -2,6 +2,7 @@ const BASE = 'https://api.themoviedb.org/3'
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY
 
 const POSTER_BASE = 'https://image.tmdb.org/t/p/w500'
+const BACKDROP_BASE = 'https://image.tmdb.org/t/p/w1280'
 const PROVIDER_LOGO_BASE = 'https://image.tmdb.org/t/p/w92'
 
 /** Región ISO 3166-1 por defecto para plataformas de streaming */
@@ -21,6 +22,18 @@ export function filterMoviesForUI(movies) {
 export function posterUrl(posterPath) {
   if (!posterPath) return null
   return `${POSTER_BASE}${posterPath}`
+}
+
+/** Construye URL de imagen de backdrop (fondo ancho) */
+export function backdropUrl(backdropPath) {
+  if (!backdropPath) return null
+  return `${BACKDROP_BASE}${backdropPath}`
+}
+
+/** Tagline localizado de una película; null si viene vacío */
+export function movieTagline(movie) {
+  const tagline = String(movie?.tagline ?? '').trim()
+  return tagline || null
 }
 
 /** Construye URL del logo de una plataforma (watch provider) */
@@ -50,6 +63,25 @@ export function formatRuntime(minutes) {
   if (hours === 0) return `${mins} min`
   if (mins === 0) return `${hours} h`
   return `${hours} h ${mins} min`
+}
+
+/** Duración estilo TMDB: «1h 56m», «45m» */
+export function formatRuntimeShort(minutes) {
+  if (minutes == null || minutes <= 0) return null
+  const hours = Math.floor(minutes / 60)
+  const mins = minutes % 60
+  if (hours === 0) return `${mins}m`
+  if (mins === 0) return `${hours}h`
+  return `${hours}h ${mins}m`
+}
+
+/** Géneros unidos estilo TMDB: «Acción, Fantasía y Aventura» */
+export function formatGenresList(genres) {
+  const names = (genres ?? []).map((genre) => genre.name).filter(Boolean)
+  if (names.length === 0) return null
+  if (names.length === 1) return names[0]
+  if (names.length === 2) return `${names[0]} y ${names[1]}`
+  return `${names.slice(0, -1).join(', ')} y ${names.at(-1)}`
 }
 
 /**
@@ -108,7 +140,10 @@ export function searchMovies(query, page = 1) {
   return tmdbGet('/search/movie', { query: q, page })
 }
 
-/** Requisito 3 — detalle de película (incluye plataformas vía append_to_response) */
+/**
+ * Requisito 3 — detalle de película (incluye plataformas vía append_to_response).
+ * Entre otros campos, la respuesta incluye `tagline` y `backdrop_path`.
+ */
 export function fetchMovieDetails(id, watchRegion = DEFAULT_WATCH_REGION) {
   return tmdbGet(`/movie/${id}`, {
     append_to_response: 'watch/providers,release_dates',

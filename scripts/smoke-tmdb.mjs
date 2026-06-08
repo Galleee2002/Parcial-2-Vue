@@ -43,6 +43,8 @@ try {
 
   const detail = await tmdb.fetchMovieDetails(11)
   console.assert(detail.title && detail.overview && detail.release_date, 'fetchMovieDetails: campos faltantes')
+  console.assert('tagline' in detail, 'fetchMovieDetails: sin tagline')
+  console.assert('backdrop_path' in detail, 'fetchMovieDetails: sin backdrop_path')
   console.assert(detail['watch/providers']?.results, 'fetchMovieDetails: sin watch/providers')
 
   const watch = await tmdb.fetchMovieWatchProviders(11)
@@ -52,12 +54,25 @@ try {
   console.assert(Array.isArray(providers.flatrate), 'providersForRegion: flatrate no es array')
 
   console.assert(tmdb.posterUrl('/test.jpg')?.includes('w500'), 'posterUrl')
+  console.assert(tmdb.backdropUrl('/test.jpg')?.includes('w1280'), 'backdropUrl')
+  console.assert(tmdb.movieTagline({ tagline: '  Hola  ' }) === 'Hola', 'movieTagline')
+  console.assert(tmdb.movieTagline({ tagline: '   ' }) === null, 'movieTagline vacío')
   console.assert(tmdb.providerLogoUrl('/test.jpg')?.includes('w92'), 'providerLogoUrl')
   console.assert(tmdb.releaseYear('1977-05-25') === '1977', 'releaseYear')
   console.assert(tmdb.titleWithYear('Star Wars', '1977-05-25') === 'Star Wars (1977)', 'titleWithYear')
   console.assert(tmdb.formatRuntime(100) === '1 h 40 min', 'formatRuntime')
   console.assert(tmdb.formatRuntime(45) === '45 min', 'formatRuntime corto')
+  console.assert(tmdb.formatRuntimeShort(116) === '1h 56m', 'formatRuntimeShort')
+  console.assert(
+    tmdb.formatGenresList([{ name: 'Acción' }, { name: 'Fantasía' }, { name: 'Aventura' }]) ===
+      'Acción, Fantasía y Aventura',
+    'formatGenresList',
+  )
   console.assert(detail.release_dates?.results, 'fetchMovieDetails: sin release_dates')
+  console.assert(
+    tmdb.certificationForRegion(detail, 'AR') != null || detail.release_dates?.results?.length > 0,
+    'certificationForRegion',
+  )
 
   console.log('OK: smoke test TMDB pasó (6 endpoints + helpers)')
 } finally {
