@@ -19,10 +19,10 @@ onMounted(() => {
 
 <template>
   <AppContainer>
-    <h1 class="text-h4 text-blue-grey-darken-4 mb-4">Mi Lista</h1>
+    <h1 class="text-h4 text-grey-lighten-5 mb-4">Mi Lista</h1>
 
     <div v-if="loading" class="d-flex justify-center py-12">
-      <v-progress-circular indeterminate color="red" size="48" />
+      <v-progress-circular indeterminate color="amber" size="48" />
     </div>
 
     <v-alert
@@ -37,14 +37,22 @@ onMounted(() => {
       <v-alert
         type="info"
         variant="tonal"
-        color="blue-grey"
+        color="grey"
         text="Todavía no agregaste películas a Mi Lista."
         class="mb-6"
       />
 
-      <v-btn color="blue-grey" variant="outlined" size="large" @click="goHome">
-        Volver a Inicio
-      </v-btn>
+      <div class="d-flex justify-center">
+        <v-btn
+          color="grey-lighten-1"
+          variant="tonal"
+          size="large"
+          class="card-btn-secondary"
+          @click="goHome"
+        >
+          Volver a Inicio
+        </v-btn>
+      </div>
     </template>
 
     <v-row v-else>

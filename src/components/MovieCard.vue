@@ -28,30 +28,39 @@ async function onToggleList() {
 </script>
 
 <template>
-  <v-card class="h-100" elevation="2" rounded="lg">
-    <v-img
-      v-if="posterSrc"
-      :src="posterSrc"
-      :alt="movie.title"
-      height="300"
-      cover
-    />
+  <v-card class="movie-card h-100 d-flex flex-column" elevation="2" rounded="lg">
+    <div class="poster-frame">
+      <img
+        v-if="posterSrc"
+        :src="posterSrc"
+        :alt="movie.title"
+        class="poster"
+        loading="lazy"
+      />
+    </div>
 
-    <v-card-title class="text-blue-grey-darken-4">
+    <v-card-title class="movie-card__title text-grey-lighten-5">
       {{ movie.title }}
     </v-card-title>
 
-    <v-card-subtitle v-if="year" class="text-blue-grey-darken-2 pb-2">
-      {{ year }}
+    <v-card-subtitle class="movie-card__year text-grey-lighten-3 pb-2">
+      {{ year || '—' }}
     </v-card-subtitle>
 
-    <v-card-actions class="movie-card-actions pa-4 pt-0">
-      <v-btn color="blue-grey" variant="outlined" size="small" @click="goToDetail(movie.id)">
+    <v-card-actions class="movie-card-actions pa-4 pt-0 mt-auto">
+      <v-btn
+        color="grey-lighten-1"
+        variant="tonal"
+        size="small"
+        class="card-btn-secondary"
+        @click="goToDetail(movie.id)"
+      >
         Ver detalle
       </v-btn>
       <v-btn
-        :color="isInList ? 'blue-grey' : 'red'"
-        :variant="isInList ? 'outlined' : 'flat'"
+        :color="isInList ? 'grey-lighten-1' : 'amber'"
+        :variant="isInList ? 'tonal' : 'flat'"
+        :class="{ 'card-btn-secondary': isInList, 'font-weight-medium': !isInList }"
         size="small"
         @click="onToggleList"
       >
@@ -70,5 +79,36 @@ async function onToggleList() {
 
 .movie-card-actions .v-btn {
   width: 100%;
+}
+
+.movie-card__title {
+  min-height: 3rem;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  line-height: 1.5rem;
+  padding-bottom: 0;
+}
+
+.movie-card__year {
+  min-height: 1.25rem;
+}
+
+.poster-frame {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  flex-shrink: 0;
+  overflow: hidden;
+  background-color: rgb(var(--v-theme-background));
+}
+
+.poster {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  object-position: top center;
 }
 </style>

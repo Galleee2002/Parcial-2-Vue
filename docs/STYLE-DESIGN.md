@@ -5,7 +5,7 @@ Guía visual de referencia para el trabajo práctico descrito en [Trabajo Práct
 **Principios rectores:**
 
 1. **Mobile first (obligatorio):** diseñar e implementar primero para pantallas pequeñas; la interfaz debe ser **fácil de usar** en celular (una columna, controles táctiles grandes, sin desbordes horizontales). Escalar layout y tipografía solo desde breakpoints `sm` / `md` / `lg`.
-2. **Paleta:** la **blue-grey** de Material Design define fondos, textos y bordes; la **red** resalta acciones importantes, errores y estados activos. El rojo no debe dominar la interfaz (objetivo: ~15–20 % de superficie acentuada).
+2. **Paleta:** la **grey** de Material Design define fondos, textos y bordes; la **amber** resalta acciones importantes, errores y estados activos. El ámbar no debe dominar la interfaz (objetivo: ~15–20 % de superficie acentuada).
 
 ---
 
@@ -25,38 +25,72 @@ Este documento es la **fuente de verdad de diseño** antes y durante la implemen
 
 ## 2. Paletas de color (tokens)
 
-Valores de la [paleta Material Design](https://m2.material.io/design/color/) que Vuetify expone como `blue-grey` y `red`, con variantes `lighten-n`, `darken-n` y `accent-n`.
+Valores de la [paleta Material Design](https://m2.material.io/design/color/) que Vuetify expone como `grey` y `amber`, con variantes `lighten-n`, `darken-n` y `accent-n`.
 
-### 2.1 Blue-grey — estructura neutra
-
-| Token semántico | Clase Vuetify (ejemplo) | Hex | Uso en la app |
-|-----------------|-------------------------|-----|---------------|
-| `bg-app` | `bg-blue-grey-lighten-5` | `#ECEFF1` | Fondo general (`v-main`, `body`) |
-| `bg-surface` | `bg-white` / `bg-blue-grey-lighten-5` | `#FFFFFF` / `#ECEFF1` | `v-card`, sheets, paneles |
-| `bg-elevated` | `bg-blue-grey-lighten-4` | `#CFD8DC` | Navbar, barras de filtros, áreas sticky |
-| `border-default` | `border-blue-grey-lighten-2` | `#90A4AE` | Bordes de cards, inputs, divisores |
-| `border-subtle` | `border-blue-grey-lighten-3` | `#B0BEC5` | Separadores internos, hover en cards |
-| `text-primary` | `text-blue-grey-darken-4` | `#263238` | Títulos, nombres de película |
-| `text-secondary` | `text-blue-grey-darken-2` | `#455A64` | Sinopsis, subtítulos, metadata (año, género) |
-| `text-disabled` | `text-blue-grey-lighten-1` | `#78909C` | Placeholders, estados vacíos, hints |
-| `ui-secondary` | `color="blue-grey"` (base) | `#607D8B` | Botones secundarios, iconos inactivos |
-
-### 2.2 Red — acento y énfasis
+### 2.1 Grey — estructura neutra
 
 | Token semántico | Clase Vuetify (ejemplo) | Hex | Uso en la app |
 |-----------------|-------------------------|-----|---------------|
-| `accent-primary` | `color="red"` | `#F44336` | CTA principal: «Agregar a favoritos», enviar búsqueda |
-| `accent-hover` | `red darken-1` | `#E53935` | Hover en botones primarios |
-| `accent-subtle` | `bg-red-lighten-5` | `#FFEBEE` | Badge «En favoritos», chips destacados |
-| `accent-icon` | `text-red-accent-2` | `#FF5252` | Icono corazón, lupa activa, ítem de nav activo |
-| `state-error` | `type="error"` / `red darken-2` | `#D32F2F` | `v-alert` ante fallos de TMDB o validación |
+| `bg-app` | `bg-grey-darken-4` | `#212121` | Fondo general (`v-main`, `body`) — tema oscuro |
+| `bg-surface` | `bg-grey-darken-3` | `#424242` | `v-card`, sheets, paneles, navbar |
+| `bg-elevated` | `bg-grey-darken-2` | `#616161` | Barras de filtros, áreas sticky |
+| `border-default` | `border-grey-darken-1` | `#757575` | Bordes de cards, inputs, divisores |
+| `border-subtle` | `border-grey` | `#9E9E9E` | Separadores internos, hover en cards |
+| `text-primary` | `text-grey-lighten-5` | `#FAFAFA` | Títulos, nombres de película |
+| `text-secondary` | `text-grey-lighten-1` | `#BDBDBD` | Sinopsis, subtítulos, metadata (año, género) |
+| `text-disabled` | `text-grey` | `#9E9E9E` | Placeholders, estados vacíos, hints |
+| `ui-secondary` | `color="grey"` (base) | `#9E9E9E` | Botones secundarios, iconos inactivos |
+
+**Escala completa grey (referencia):**
+
+| Variante | Hex |
+|----------|-----|
+| grey-lighten-5 | `#FAFAFA` |
+| grey-lighten-4 | `#F5F5F5` |
+| grey-lighten-3 | `#EEEEEE` |
+| grey-lighten-2 | `#E0E0E0` |
+| grey-lighten-1 | `#BDBDBD` |
+| grey (base) | `#9E9E9E` |
+| grey-darken-1 | `#757575` |
+| grey-darken-2 | `#616161` |
+| grey-darken-3 | `#424242` |
+| grey-darken-4 | `#212121` |
+
+### 2.2 Amber — acento y énfasis
+
+| Token semántico | Clase Vuetify (ejemplo) | Hex | Uso en la app |
+|-----------------|-------------------------|-----|---------------|
+| `accent-primary` | `color="amber"` | `#FFC107` | CTA principal: «Agregar a favoritos», enviar búsqueda |
+| `accent-hover` | `amber darken-1` | `#FFB300` | Hover en botones primarios |
+| `accent-subtle` | `bg-amber-lighten-5` | `#FFF8E1` | Badge «En favoritos», chips destacados |
+| `accent-icon` | `text-amber-accent-2` | `#FFD740` | Lupa activa, ítem de nav activo |
+| `state-error` | `type="error"` / `amber darken-3` | `#FF8F00` | `v-alert` ante fallos de TMDB o validación |
+
+**Escala completa amber (referencia):**
+
+| Variante | Hex |
+|----------|-----|
+| amber-lighten-5 | `#FFF8E1` |
+| amber-lighten-4 | `#FFECB3` |
+| amber-lighten-3 | `#FFE082` |
+| amber-lighten-2 | `#FFD54F` |
+| amber-lighten-1 | `#FFCA28` |
+| amber (base) | `#FFC107` |
+| amber-darken-1 | `#FFB300` |
+| amber-darken-2 | `#FFA000` |
+| amber-darken-3 | `#FF8F00` |
+| amber-darken-4 | `#FF6F00` |
+| amber-accent-1 | `#FFE57F` |
+| amber-accent-2 | `#FFD740` |
+| amber-accent-3 | `#FFC400` |
+| amber-accent-4 | `#FFAB00` |
 
 ### 2.3 Reglas de uso
 
-1. **Fondos y lectura:** priorizar `bg-app` + cards blancas; texto principal siempre `text-primary` sobre superficies claras.
-2. **Rojo:** reservar para una acción principal por vista, navegación activa, favoritos y errores.
-3. **Imágenes TMDB:** los pósters aportan color; no competir con rojos saturados en el mismo bloque visual.
-4. **Modo oscuro:** fuera de alcance inicial; el tema documentado es **light** (`dark: false`).
+1. **Fondos y lectura:** priorizar `bg-app` (`grey-darken-4`) + cards `grey-darken-3`; texto principal `grey-lighten-5` sobre superficies oscuras.
+2. **Ámbar:** reservar para una acción principal por vista, navegación activa, favoritos y alertas.
+3. **Imágenes TMDB:** los pósters aportan color; no competir con ámbar saturado en el mismo bloque visual.
+4. **Tema activo:** **dark** (`moviesDark` en `src/main.js`).
 
 ---
 
@@ -66,40 +100,42 @@ Documentación consultada vía [Context7](https://context7.com) (`/vuetifyjs/vue
 
 - **Clases de color:** cada tono Material genera utilidades `bg-{color}`, `text-{color}`, `border-{color}` y variantes `text-red-darken-1`, etc. ([Colors — Classes](https://github.com/vuetifyjs/vuetify/blob/master/packages/docs/src/pages/en/styles/colors.md)).
 - **Tema global:** `createVuetify({ theme: { themes: { ... } } })` define `colors` y `variables`; Vuetify expone variables CSS `--v-theme-*` para estilos custom ([Theme](https://github.com/vuetifyjs/vuetify/blob/master/packages/docs/src/pages/en/features/theme.md)).
-- **Props en componentes:** `color="red"`, `bg-color="blue-grey darken-3"` son válidos en `v-btn`, `v-app-bar`, `v-progress-circular`, etc.
+- **Props en componentes:** `color="amber"`, `bg-color="grey darken-3"` son válidos en `v-btn`, `v-app-bar`, `v-progress-circular`, etc.
 
-Al instalar Vuetify 4, aplicar el tema `moviesTheme` en `src/main.js` (ver sección 4).
+El tema `moviesDark` está aplicado en `src/main.js` (ver sección 4).
 
 ---
 
-## 4. Tema Vuetify — implementación futura
+## 4. Tema Vuetify — implementación (`src/main.js`)
 
-Copiar o adaptar cuando el proyecto incluya Vuetify según [RULES.MD](./RULES.MD):
+Tema oscuro **grey + amber** activo en el proyecto:
 
 ```js
-// src/main.js — referencia; no aplicado hasta instalar vuetify
+// src/main.js
 import { createVuetify } from 'vuetify'
 
-const moviesTheme = {
-  dark: false,
+const moviesDarkTheme = {
+  dark: true,
   colors: {
-    background: '#ECEFF1', // blue-grey lighten-5 — bg-app
-    surface: '#FFFFFF',
-    'surface-bright': '#FFFFFF',
-    'surface-light': '#ECEFF1',
-    'surface-variant': '#CFD8DC', // blue-grey lighten-4
-    'on-surface-variant': '#455A64', // text-secondary
-    primary: '#F44336', // red — CTAs
-    'primary-darken-1': '#E53935',
-    secondary: '#607D8B', // blue-grey base
-    'secondary-darken-1': '#546E7A',
-    error: '#D32F2F',
-    info: '#607D8B',
-    success: '#607D8B',
-    warning: '#FF5252',
+    background: '#212121', // grey darken-4 — bg-app
+    surface: '#424242', // grey darken-3 — cards
+    'surface-bright': '#616161', // grey darken-2
+    'surface-light': '#424242',
+    'surface-variant': '#616161',
+    'on-surface': '#FAFAFA', // grey lighten-5 — text-primary
+    'on-surface-variant': '#BDBDBD', // grey lighten-1 — text-secondary
+    'on-background': '#FAFAFA',
+    primary: '#FFC107', // amber — CTAs
+    'primary-darken-1': '#FFB300',
+    secondary: '#9E9E9E', // grey base
+    'secondary-darken-1': '#757575',
+    error: '#FF8F00', // amber darken-3
+    info: '#9E9E9E',
+    success: '#9E9E9E',
+    warning: '#FFD740', // amber accent-2
   },
   variables: {
-    'border-color': '#90A4AE',
+    'border-color': '#757575',
     'border-opacity': 0.24,
     'high-emphasis-opacity': 0.87,
     'medium-emphasis-opacity': 0.6,
@@ -109,21 +145,21 @@ const moviesTheme = {
 
 export default createVuetify({
   theme: {
-    defaultTheme: 'moviesTheme',
+    defaultTheme: 'moviesDark',
     themes: {
-      moviesTheme,
+      moviesDark: moviesDarkTheme,
     },
   },
 })
 ```
 
-**Clases utilitarias frecuentes (sin tema custom):**
+**Clases utilitarias frecuentes:**
 
 ```html
-<div class="bg-blue-grey-lighten-5">
-  <h1 class="text-blue-grey-darken-4">Título</h1>
-  <p class="text-blue-grey-darken-2">Sinopsis</p>
-  <v-btn color="red">Agregar a favoritos</v-btn>
+<div class="bg-grey-darken-4">
+  <h1 class="text-grey-lighten-5">Título</h1>
+  <p class="text-grey-lighten-1">Sinopsis</p>
+  <v-btn color="amber">Agregar a favoritos</v-btn>
 </div>
 ```
 
@@ -171,27 +207,27 @@ export default createVuetify({
 
 Vinculación entre consigna, pantalla y paleta.
 
-| # | Requisito (PDF) | Vista / componente | Blue-grey | Red |
-|---|-----------------|-------------------|-----------|-----|
-| 1 | Lista de populares en inicio | `HomeView`, `MovieCard` | Fondo app, cards blancas, títulos darken-4 | — |
-| 2 | Búsqueda por título + resultados | `v-text-field`, grid resultados | Campo outlined, bordes lighten-2 | Icono lupa / foco `color="red"` |
+| # | Requisito (PDF) | Vista / componente | Grey | Amber |
+|---|-----------------|-------------------|------|-------|
+| 1 | Lista de populares en inicio | `HomeView`, `MovieCard` | Fondo app, cards surface, títulos lighten-5 | — |
+| 2 | Búsqueda por título + resultados | `v-text-field`, grid resultados | Campo outlined, bordes grey | Icono lupa / foco `color="amber"` |
 | 3 | Detalle (título, sinopsis, año, póster, +dato) | `MovieDetailView` | Textos secundarios, layout | Botón favoritos (extra 5) |
-| 4 | Filtro (género o clasificación) | `v-select` / `MovieFilters` | Panel y labels en blue-grey | Opción seleccionada: acento sutil opcional |
+| 4 | Filtro (género o clasificación) | `v-select` / `MovieFilters` | Panel y labels en grey | Opción seleccionada: acento sutil opcional |
 | 5 | Favoritos + almacenamiento | Detalle + `FavoritesView` | Lista y vacío en text-secondary | CTA y badge favorito |
 | 6 | UI **mobile first** (obligatorio en el repo) | Grid, `v-app-bar`, botones ≥ 48px, §5.1 | Estructura responsive neutra | Solo acentos táctiles críticos |
-| 7 | Datos con `fetch` TMDB | Estados loading / error | `v-progress-circular color="blue-grey"` | `v-alert type="error"` |
+| 7 | Datos con `fetch` TMDB | Estados loading / error | `v-progress-circular color="grey"` | `v-alert type="error"` |
 
 Flujo visual resumido:
 
 ```mermaid
 flowchart LR
-  subgraph neutral [Blue-grey]
+  subgraph neutral [Grey]
     Home[HomeView]
     Detail[MovieDetailView]
     Fav[FavoritesView]
     Nav[NavBar]
   end
-  subgraph accent [Red]
+  subgraph accent [Amber]
     SearchCTA[Busqueda activa]
     FavBtn[Favoritos CTA]
     NavActive[Ruta activa]
@@ -213,11 +249,11 @@ flowchart LR
 
 | Elemento | Estilo |
 |----------|--------|
-| Fondo | `bg-blue-grey-lighten-5` en `v-main` |
-| `MovieCard` | `v-card` blanco, `elevation="2"`, `rounded="lg"`, borde `blue-grey-lighten-2`; hover: `elevation="4"` |
-| Búsqueda | `v-text-field` `variant="outlined"`, `color="red"`, label «Buscar película» |
+| Fondo | Tema `moviesDark` — `grey-darken-4` en `v-main` |
+| `MovieCard` | `v-card` surface (`grey-darken-3`), `elevation="2"`, `rounded="lg"`; hover: `elevation="4"` |
+| Búsqueda | `v-text-field` `variant="outlined"`, `color="amber"`, label «Buscar película» |
 | Filtro género | `v-select` outlined, mismo esquema de borde |
-| Carga | `v-progress-circular` `color="blue-grey"` centrado |
+| Carga | `v-progress-circular` `color="amber"` centrado |
 | Error API | `v-alert` `type="error"` |
 
 ### 7.2 Detalle (`/movie/:id`)
@@ -227,11 +263,11 @@ flowchart LR
 | Elemento | Estilo |
 |----------|--------|
 | Layout | `v-container`; columna póster `cols="12" md="4"` |
-| Título | `text-h4` `text-blue-grey-darken-4` |
-| Metadata | `text-caption` `text-blue-grey-darken-2` |
-| Sinopsis | `text-body-2` |
-| Póster sin imagen | Placeholder `bg-blue-grey-lighten-4` |
-| Favoritos | `v-btn color="red" variant="flat"`; estado activo: `bg-red-lighten-5` + icono `mdi-heart` |
+| Título | `text-h4` `text-grey-lighten-5` |
+| Metadata | `text-caption` `text-grey-lighten-1` |
+| Sinopsis | `text-body-2` `text-grey-lighten-3` |
+| Póster sin imagen | Placeholder `bg-grey-darken-4` |
+| Favoritos | `v-btn color="amber" variant="flat"`; estado activo: `bg-amber-lighten-5` + icono `mdi-heart` |
 
 ### 7.3 Favoritos (`/favorites`)
 
@@ -239,10 +275,10 @@ flowchart LR
 
 | Elemento | Estilo |
 |----------|--------|
-| Título | `text-h4` blue-grey darken-4 |
-| Vacío | `text-blue-grey-darken-2` — «No tenés películas guardadas.» |
+| Título | `text-h4` grey lighten-5 |
+| Vacío | `text-grey-lighten-1` — «No tenés películas guardadas.» |
 | Lista | Mismo `MovieCard` que Home |
-| Acento | Icono `mdi-heart` `text-red-accent-2` junto al título (opcional) |
+| Acento | Icono `mdi-heart` `text-amber-accent-2` junto al título (opcional) |
 
 ### 7.4 NavBar (named view)
 
@@ -250,18 +286,18 @@ flowchart LR
 
 | Elemento | Estilo |
 |----------|--------|
-| Barra | `color="blue-grey-darken-3"` (`#37474F`), texto `blue-grey-lighten-5` |
-| Enlaces | `RouterLink`; inactivo: blanco/lighten-5 |
-| Ruta activa | `text-red-accent-2` o subrayado rojo |
+| Barra | `color="surface"` (`#424242`), texto `grey-lighten-5` |
+| Enlaces | `RouterLink`; inactivo: `grey-lighten-5` |
+| Ruta activa | `text-amber-accent-2` o subrayado ámbar |
 | Móvil | Altura mínima 56px; targets táctiles amplios |
 
 ### 7.5 Estados globales (RULES §11)
 
 Siempre mostrar **loading** y **error** en operaciones async:
 
-- **Loading:** spinner `blue-grey`, no rojo (evitar ansiedad visual).
-- **Error:** `v-alert` rojo del tema; mensaje en español.
-- **Éxito / info:** preferir `blue-grey` o texto secundario; no introducir verde/azul fuera de paleta.
+- **Loading:** spinner `amber` para feedback visible en fondo oscuro.
+- **Error:** `v-alert` ámbar del tema; mensaje en español.
+- **Éxito / info:** preferir `grey` o texto secundario; no introducir colores fuera de paleta grey/amber.
 
 ---
 
@@ -269,22 +305,22 @@ Siempre mostrar **loading** y **error** en operaciones async:
 
 | Necesidad (RULES §10) | Componente | Estilo propuesto |
 |----------------------|------------|------------------|
-| Búsqueda | `v-text-field` | `variant="outlined"`, `color="red"`, `prepend-inner-icon="mdi-magnify"` |
-| Filtro género | `v-select` | Outlined; menú con `bg-white` |
-| Lista / tarjeta | `v-card`, `v-img` | Ver §7.1; imagen `cover`, altura ~300px en card |
-| Carga | `v-progress-circular` | `color="blue-grey"`, `indeterminate` |
+| Búsqueda | `v-text-field` | `variant="outlined"`, `color="amber"`, `prepend-inner-icon="mdi-magnify"` |
+| Filtro género | `v-select` | Outlined; menú con surface del tema |
+| Lista / tarjeta | `v-card`, poster | Ver §7.1; `aspect-ratio 2/3`, `object-fit: contain` |
+| Carga | `v-progress-circular` | `color="amber"`, `indeterminate` |
 | Error | `v-alert` | `type="error"`, `variant="tonal"` opcional |
-| Acción primaria | `v-btn` | `color="red"`, `variant="flat"` |
-| Acción secundaria | `v-btn` | `color="blue-grey"`, `variant="outlined"` |
+| Acción primaria | `v-btn` | `color="amber"`, `variant="flat"` |
+| Acción secundaria | `v-btn` | `color="grey"`, `variant="outlined"` |
 
 ---
 
 ## 9. Accesibilidad y UX
 
 - **Mobile first:** la experiencia de referencia es el teléfono; desktop amplía espacio, no redefine la jerarquía ni oculta acciones clave.
-- **Contraste:** `text-blue-grey-darken-4` sobre `#ECEFF1` / `#FFFFFF` cumple WCAG AA para cuerpo.
+- **Contraste:** `text-grey-lighten-5` sobre `#212121` / `#424242` cumple WCAG AA para cuerpo.
 - **Táctil:** botones de detalle, favoritos y navbar con altura mínima **48px** en móvil (`size="large"` si hace falta); separación suficiente entre targets.
-- **Foco:** respetar anillo de foco de Vuetify; campos con `color="red"` en estado focused.
+- **Foco:** respetar anillo de foco de Vuetify; campos con `color="amber"` en estado focused.
 - **Idioma:** etiquetas y mensajes en español; nombres de código en inglés (RULES §11).
 
 ---
@@ -293,11 +329,11 @@ Siempre mostrar **loading** y **error** en operaciones async:
 
 - [ ] UI en español en todos los labels y alertas
 - [ ] **Mobile first:** probado en viewport móvil; touch ≥ 48px; sin scroll horizontal (§5.1)
-- [ ] Jerarquía: explorar (blue-grey) → acción importante (red)
-- [ ] Sin colores fuera de blue-grey/red salvo pósters TMDB
+- [ ] Jerarquía: explorar (grey) → acción importante (amber)
+- [ ] Sin colores fuera de grey/amber salvo pósters TMDB
 - [ ] Grid mobile first según RULES §10
 - [ ] `loading` y `error` visibles en cada vista con datos async
-- [ ] Al instalar Vuetify: registrar `moviesTheme` en `src/main.js`
+- [ ] Tema `moviesDark` (grey + amber) registrado en `src/main.js`
 - [ ] NavBar con named views sin duplicar estilos por vista
 
 ---

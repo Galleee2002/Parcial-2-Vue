@@ -21,17 +21,19 @@ function onClick() {
 
 <template>
   <v-card class="top-movie-card" elevation="2" rounded="lg" @click="onClick">
-    <v-img
-      v-if="posterSrc"
-      :src="posterSrc"
-      :alt="movie.title"
-      height="200"
-      cover
-    />
-    <v-card-title class="top-movie-title text-blue-grey-darken-4 px-3 pt-2 pb-0">
+    <div class="poster-frame">
+      <img
+        v-if="posterSrc"
+        :src="posterSrc"
+        :alt="movie.title"
+        class="poster"
+        loading="lazy"
+      />
+    </div>
+    <v-card-title class="top-movie-title text-grey-lighten-5 px-3 pt-2 pb-0">
       {{ movie.title }}
     </v-card-title>
-    <v-card-subtitle v-if="year" class="top-movie-year px-3 pb-2 text-blue-grey-darken-2">
+    <v-card-subtitle v-if="year" class="top-movie-year px-3 pb-2 text-grey-lighten-3">
       {{ year }}
     </v-card-subtitle>
   </v-card>
@@ -42,17 +44,39 @@ function onClick() {
   cursor: pointer;
   width: 150px;
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .top-movie-title {
   font-size: 0.8rem;
   line-height: 1.2;
-  white-space: nowrap;
+  min-height: 2.4rem;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .top-movie-year {
   font-size: 0.75rem;
+  min-height: 1.125rem;
+}
+
+.poster-frame {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  flex-shrink: 0;
+  overflow: hidden;
+  background-color: rgb(var(--v-theme-background));
+}
+
+.poster {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  object-position: top center;
 }
 </style>

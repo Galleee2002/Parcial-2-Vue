@@ -25,6 +25,39 @@ export function releaseYear(releaseDate) {
   return releaseDate.slice(0, 4)
 }
 
+/** Título con año: «Película (2026)» */
+export function titleWithYear(title, releaseDate) {
+  const year = releaseYear(releaseDate)
+  if (!title) return ''
+  return year ? `${title} (${year})` : title
+}
+
+/** Duración en horas y minutos: «1 h 40 min», «45 min» */
+export function formatRuntime(minutes) {
+  if (minutes == null || minutes <= 0) return null
+  const hours = Math.floor(minutes / 60)
+  const mins = minutes % 60
+  if (hours === 0) return `${mins} min`
+  if (mins === 0) return `${hours} h`
+  return `${hours} h ${mins} min`
+}
+
+/**
+ * Clasificación por edades para una región (release_dates de TMDB).
+ * Prioriza estreno teatral (type 3) y luego cualquier fecha con certification.
+ */
+export function certificationForRegion(movie, region = DEFAULT_WATCH_REGION) {
+  const country = movie?.release_dates?.results?.find((entry) => entry.iso_3166_1 === region)
+  const dates = country?.release_dates ?? []
+  if (dates.length === 0) return null
+
+  const theatrical = dates.find((d) => d.type === 3 && d.certification?.trim())
+  if (theatrical) return theatrical.certification.trim()
+
+  const any = dates.find((d) => d.certification?.trim())
+  return any ? any.certification.trim() : null
+}
+
 async function tmdbGet(path, params = {}) {
   if (!API_KEY) {
     throw new Error('VITE_TMDB_API_KEY no está configurada. Creá un archivo .env en la raíz del proyecto.')
@@ -68,7 +101,7 @@ export function searchMovies(query, page = 1) {
 /** Requisito 3 — detalle de película (incluye plataformas vía append_to_response) */
 export function fetchMovieDetails(id, watchRegion = DEFAULT_WATCH_REGION) {
   return tmdbGet(`/movie/${id}`, {
-    append_to_response: 'watch/providers',
+    append_to_response: 'watch/providers,release_dates',
     watch_region: watchRegion,
   })
 }

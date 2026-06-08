@@ -1,6 +1,6 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import {
   fetchPopularMovies,
   searchMovies,
@@ -11,14 +11,16 @@ import AppContainer from '@/components/AppContainer.vue'
 import MovieCard from '@/components/MovieCard.vue'
 import TopMovieCard from '@/components/TopMovieCard.vue'
 import { useFavorites } from '@/composables/useFavorites'
+import { useMovieSearch } from '@/composables/useMovieSearch'
 
+const route = useRoute()
 const router = useRouter()
 const { load: loadFavorites } = useFavorites()
+const { searchQuery, searchTick } = useMovieSearch()
 
 const movies = ref([])
 const topMovies = ref([])
 const genres = ref([])
-const search = ref('')
 const selectedGenre = ref(null)
 const loading = ref(true)
 const error = ref(null)
@@ -27,7 +29,7 @@ const carouselRef = ref(null)
 const showLeftFade = ref(false)
 const showRightFade = ref(false)
 
-const genreOptions = ref([{ title: 'Todos los géneros', value: null }])
+const genreOptions = ref([])
 
 function setError(err) {
   error.value = err instanceof Error ? err.message : 'Error al cargar películas'
@@ -46,10 +48,10 @@ async function loadTopMovies() {
 async function loadGenres() {
   const data = await fetchGenres()
   genres.value = data.genres ?? []
-  genreOptions.value = [
-    { title: 'Todos los géneros', value: null },
-    ...genres.value.map((genre) => ({ title: genre.name, value: genre.id })),
-  ]
+  genreOptions.value = genres.value.map((genre) => ({
+    title: genre.name,
+    value: genre.id,
+  }))
 }
 
 async function refreshMovies() {
@@ -57,7 +59,7 @@ async function refreshMovies() {
   error.value = null
 
   try {
-    const query = search.value.trim()
+    const query = String(searchQuery.value ?? '').trim()
     if (query) {
       const data = await searchMovies(query)
       movies.value = data.results ?? []
@@ -92,9 +94,23 @@ function updateCarouselEdges() {
   if (!carousel) return
 
   const maxScroll = Math.max(0, carousel.scrollWidth - carousel.clientWidth)
-  showLeftFade.value = carousel.scrollLeft > 1
-  showRightFade.value = carousel.scrollLeft < maxScroll - 1
+  showLeftFade.value = carousel.scrollLeft > 4
+  showRightFade.value = carousel.scrollLeft < maxScroll - 4
 }
+
+watch(searchTick, () => {
+  if (route.name === 'home') {
+    onSearch()
+  }
+})
+
+watch(topMovies, async () => {
+  await nextTick()
+  if (carouselRef.value) {
+    carouselRef.value.scrollLeft = 0
+  }
+  updateCarouselEdges()
+})
 
 function scrollCarousel(direction) {
   const carousel = carouselRef.value
@@ -122,6 +138,7 @@ onMounted(async () => {
     loading.value = false
   }
 
+  await nextTick()
   updateCarouselEdges()
   window.addEventListener('resize', updateCarouselEdges)
 })
@@ -133,56 +150,58 @@ onUnmounted(() => {
 
 <template>
   <AppContainer>
-    <h1 class="text-h4 text-blue-grey-darken-4 mb-2">Películas populares</h1>
-    <p class="text-body-1 text-blue-grey-darken-2 mb-6">
-      Buscá películas por título, filtrá por género y agregá tus favoritas a Mi Lista.
-    </p>
+    <section class="home-filters mb-6">
+      <div class="home-filters__intro">
+        <h1 class="text-h4 text-grey-lighten-5">Películas populares</h1>
+        <p class="text-body-1 text-grey-lighten-3">
+          Buscá películas por título, filtrá por género y agregá tus favoritas a Mi Lista.
+        </p>
+      </div>
 
-    <v-row class="mb-4">
-      <v-col cols="12" md="8">
-        <v-text-field
-          v-model="search"
-          label="Buscar película"
-          prepend-inner-icon="mdi-magnify"
-          variant="outlined"
-          color="red"
-          clearable
-          @keyup.enter="onSearch"
-          @click:clear="onSearch"
-        />
-      </v-col>
-      <v-col cols="12" md="4">
+      <v-text-field
+        v-model="searchQuery"
+        class="home-filters__search d-sm-none"
+        label="Buscar película"
+        prepend-inner-icon="mdi-magnify"
+        variant="outlined"
+        color="primary"
+        density="comfortable"
+        hide-details
+        clearable
+        @keyup.enter="onSearch"
+        @click:clear="onSearch"
+      />
+
+      <div class="home-filters__genre-wrap">
         <v-select
           v-model="selectedGenre"
+          class="home-filters__genre"
           :items="genreOptions"
           item-title="title"
           item-value="value"
-          label="Filtrar por género"
+          label="Género"
+          placeholder="Todos los géneros"
+          prepend-inner-icon="mdi-movie-filter-outline"
           variant="outlined"
-          color="red"
+          color="primary"
+          density="comfortable"
+          hide-details
           clearable
           @update:model-value="onGenreChange"
+          @click:clear="onGenreChange"
         />
-      </v-col>
-    </v-row>
-
-    <v-row class="mb-2">
-      <v-col cols="12" class="d-flex justify-end">
-        <v-btn color="red" variant="flat" size="large" :loading="loading" @click="onSearch">
-          Buscar
-        </v-btn>
-      </v-col>
-    </v-row>
+      </div>
+    </section>
 
     <section v-if="topMovies.length > 0" class="mb-8">
-      <h2 class="text-h5 text-blue-grey-darken-4 mb-4">Top 10</h2>
+      <h2 class="text-h5 text-grey-lighten-5 mb-4">Top 10</h2>
 
       <div class="carousel-wrapper">
         <v-btn
-          v-show="showLeftFade"
-          class="carousel-arrow carousel-arrow-left d-none d-sm-flex"
+          v-if="showLeftFade"
+          class="carousel-arrow carousel-arrow-left"
           icon="mdi-chevron-left"
-          color="blue-grey-darken-3"
+          color="grey-darken-2"
           size="small"
           aria-label="Anterior"
           @click="scrollCarousel(-1)"
@@ -190,16 +209,16 @@ onUnmounted(() => {
 
         <v-btn
           v-show="showRightFade"
-          class="carousel-arrow carousel-arrow-right d-none d-sm-flex"
+          class="carousel-arrow carousel-arrow-right"
           icon="mdi-chevron-right"
-          color="blue-grey-darken-3"
+          color="grey-darken-2"
           size="small"
           aria-label="Siguiente"
           @click="scrollCarousel(1)"
         />
 
         <div
-          v-show="showLeftFade"
+          v-if="showLeftFade"
           class="carousel-fade carousel-fade-left is-visible"
         />
         <div
@@ -219,7 +238,7 @@ onUnmounted(() => {
     </section>
 
     <div v-if="loading" class="d-flex justify-center py-12">
-      <v-progress-circular indeterminate color="red" size="48" />
+      <v-progress-circular indeterminate color="amber" size="48" />
     </div>
 
     <v-alert
@@ -234,12 +253,12 @@ onUnmounted(() => {
       v-else-if="movies.length === 0"
       type="info"
       variant="tonal"
-      color="blue-grey"
+      color="grey"
       text="No se encontraron películas."
       class="mb-4"
     />
 
-    <v-row v-else>
+    <v-row v-else class="movie-grid">
       <v-col
         v-for="movie in movies"
         :key="movie.id"
@@ -247,6 +266,7 @@ onUnmounted(() => {
         sm="6"
         md="4"
         lg="3"
+        class="movie-grid__col"
       >
         <MovieCard :movie="movie" />
       </v-col>
@@ -255,6 +275,83 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+.home-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.home-filters__intro h1 {
+  margin-bottom: 8px;
+}
+
+.home-filters__intro p {
+  margin-bottom: 0;
+}
+
+.home-filters__genre-wrap {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.home-filters__genre {
+  width: 100%;
+  max-width: 100%;
+}
+
+@media (min-width: 600px) {
+  .home-filters {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px 24px;
+  }
+
+  .home-filters__intro {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .home-filters__genre-wrap {
+    flex: 0 0 auto;
+    justify-content: flex-end;
+    width: auto;
+  }
+
+  .home-filters__genre {
+    min-width: 220px;
+    max-width: 280px;
+  }
+}
+
+@media (min-width: 960px) {
+  .home-filters__genre {
+    min-width: 260px;
+    max-width: 320px;
+  }
+}
+
+/* Grid de películas (debajo del Top 10) — móvil */
+@media (max-width: 599px) {
+  .movie-grid {
+    padding-inline: 8px;
+  }
+
+  .movie-grid__col {
+    display: flex;
+    justify-content: center;
+    padding-block: 4px;
+  }
+
+  .movie-grid__col :deep(.movie-card) {
+    width: 100%;
+    max-width: 280px;
+    margin-inline: auto;
+  }
+}
+
 .carousel-wrapper {
   position: relative;
 }
@@ -263,16 +360,21 @@ onUnmounted(() => {
   display: flex;
   gap: 16px;
   overflow-x: auto;
-  padding: 4px 12px 8px;
+  padding: 4px 0 8px;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-x;
+  scroll-snap-type: x proximity;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
 
 .top-carousel::-webkit-scrollbar {
   display: none;
+}
+
+.top-carousel > * {
+  scroll-snap-align: start;
 }
 
 .carousel-fade {
@@ -286,12 +388,12 @@ onUnmounted(() => {
 
 .carousel-fade-left {
   left: 0;
-  background: linear-gradient(to right, #eceff1 20%, transparent);
+  background: linear-gradient(to right, rgb(var(--v-theme-background)) 20%, transparent);
 }
 
 .carousel-fade-right {
   right: 0;
-  background: linear-gradient(to left, #eceff1 20%, transparent);
+  background: linear-gradient(to left, rgb(var(--v-theme-background)) 20%, transparent);
 }
 
 .carousel-arrow {
@@ -299,6 +401,9 @@ onUnmounted(() => {
   top: 50%;
   transform: translateY(-50%);
   z-index: 2;
+  min-width: 40px;
+  min-height: 40px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
 }
 
 .carousel-arrow-left {
@@ -307,5 +412,11 @@ onUnmounted(() => {
 
 .carousel-arrow-right {
   right: 0;
+}
+
+@media (min-width: 600px) {
+  .top-carousel {
+    padding-inline: 0 12px;
+  }
 }
 </style>

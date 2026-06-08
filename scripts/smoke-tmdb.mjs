@@ -54,6 +54,10 @@ try {
   console.assert(tmdb.posterUrl('/test.jpg')?.includes('w500'), 'posterUrl')
   console.assert(tmdb.providerLogoUrl('/test.jpg')?.includes('w92'), 'providerLogoUrl')
   console.assert(tmdb.releaseYear('1977-05-25') === '1977', 'releaseYear')
+  console.assert(tmdb.titleWithYear('Star Wars', '1977-05-25') === 'Star Wars (1977)', 'titleWithYear')
+  console.assert(tmdb.formatRuntime(100) === '1 h 40 min', 'formatRuntime')
+  console.assert(tmdb.formatRuntime(45) === '45 min', 'formatRuntime corto')
+  console.assert(detail.release_dates?.results, 'fetchMovieDetails: sin release_dates')
 
   console.log('OK: smoke test TMDB pasó (6 endpoints + helpers)')
 } finally {

@@ -4,7 +4,9 @@ import { useRoute, useRouter } from 'vue-router'
 import {
   fetchMovieDetails,
   posterUrl,
-  releaseYear,
+  titleWithYear,
+  formatRuntime,
+  certificationForRegion,
   providersForRegion,
   providerLogoUrl,
   DEFAULT_WATCH_REGION,
@@ -21,10 +23,19 @@ const loading = ref(true)
 const error = ref(null)
 
 const posterSrc = computed(() => (movie.value ? posterUrl(movie.value.poster_path) : null))
-const year = computed(() => (movie.value ? releaseYear(movie.value.release_date) : null))
+const displayTitle = computed(() =>
+  movie.value ? titleWithYear(movie.value.title, movie.value.release_date) : '',
+)
 const genreNames = computed(() =>
   (movie.value?.genres ?? []).map((genre) => genre.name).join(', '),
 )
+const runtimeLabel = computed(() =>
+  movie.value ? formatRuntime(movie.value.runtime) : null,
+)
+const certification = computed(() =>
+  movie.value ? certificationForRegion(movie.value, DEFAULT_WATCH_REGION) : null,
+)
+const voteAverage = computed(() => movie.value?.vote_average ?? null)
 const watchProviders = computed(() =>
   movie.value ? providersForRegion(movie.value, DEFAULT_WATCH_REGION) : null,
 )
@@ -75,7 +86,7 @@ onMounted(() => {
 <template>
   <AppContainer>
     <div v-if="loading" class="d-flex justify-center py-12">
-      <v-progress-circular indeterminate color="red" size="48" />
+      <v-progress-circular indeterminate color="amber" size="48" />
     </div>
 
     <v-alert
@@ -108,26 +119,35 @@ onMounted(() => {
         </v-col>
 
         <v-col cols="12" md="8">
-          <h1 class="text-h4 text-blue-grey-darken-4 mb-4">
-            {{ movie.title }}
+          <h1 class="text-h4 text-grey-lighten-5 mb-4">
+            {{ displayTitle }}
           </h1>
 
-          <div class="d-flex flex-wrap ga-2 mb-4">
-            <v-chip v-if="year" color="blue-grey" variant="tonal">
-              {{ year }}
+          <div class="d-flex flex-wrap align-center ga-2 mb-4">
+            <v-chip v-if="certification" color="grey" variant="tonal">
+              {{ certification }}
             </v-chip>
-            <v-chip v-if="genreNames" color="blue-grey" variant="tonal">
+            <v-chip v-if="genreNames" color="grey" variant="tonal">
               {{ genreNames }}
             </v-chip>
-            <v-chip v-if="movie.vote_average != null" color="blue-grey" variant="tonal">
-              {{ movie.vote_average.toFixed(1) }}/10
+            <v-chip
+              v-if="voteAverage != null"
+              color="grey"
+              variant="tonal"
+              class="rating-chip"
+              :aria-label="`Valoración ${voteAverage.toFixed(1)} de 10`"
+            >
+              <v-icon icon="mdi-star" color="amber" size="small" aria-hidden="true" />
+              <span class="rating-chip__score text-grey-lighten-5">
+                {{ voteAverage.toFixed(1) }}/10
+              </span>
             </v-chip>
-            <v-chip v-if="movie.runtime" color="blue-grey" variant="tonal">
-              {{ movie.runtime }} min
+            <v-chip v-if="runtimeLabel" color="grey" variant="tonal">
+              {{ runtimeLabel }}
             </v-chip>
           </div>
 
-          <p class="text-body-1 text-blue-grey-darken-2 mb-6">
+          <p class="text-body-1 text-grey-lighten-3 mb-6">
             {{ movie.overview }}
           </p>
 
@@ -135,7 +155,7 @@ onMounted(() => {
             v-if="watchProviders && watchProviders.flatrate.length > 0"
             class="mb-6"
           >
-            <h2 class="text-h6 text-blue-grey-darken-4 mb-3">Disponible en streaming</h2>
+            <h2 class="text-h6 text-grey-lighten-5 mb-3">Disponible en streaming</h2>
             <div class="d-flex flex-wrap ga-3">
               <div
                 v-for="provider in watchProviders.flatrate"
@@ -151,7 +171,7 @@ onMounted(() => {
                   cover
                   rounded="lg"
                 />
-                <span class="text-caption text-blue-grey-darken-2 mt-1">
+                <span class="text-caption text-grey-lighten-3 mt-1">
                   {{ provider.provider_name }}
                 </span>
               </div>
@@ -160,14 +180,21 @@ onMounted(() => {
 
           <div class="d-flex flex-column flex-sm-row ga-3">
             <v-btn
-              :color="isInList ? 'blue-grey' : 'red'"
-              :variant="isInList ? 'outlined' : 'flat'"
+              :color="isInList ? 'grey-lighten-1' : 'amber'"
+              :variant="isInList ? 'tonal' : 'flat'"
+              :class="{ 'card-btn-secondary': isInList, 'font-weight-medium': !isInList }"
               size="large"
               @click="onToggleList"
             >
               {{ isInList ? 'Quitar de Mi Lista' : 'Agregar a Mi Lista' }}
             </v-btn>
-            <v-btn color="blue-grey" variant="outlined" size="large" @click="goBack">
+            <v-btn
+              color="grey-lighten-1"
+              variant="tonal"
+              size="large"
+              class="card-btn-secondary"
+              @click="goBack"
+            >
               Volver
             </v-btn>
           </div>
@@ -176,3 +203,18 @@ onMounted(() => {
     </template>
   </AppContainer>
 </template>
+
+<style scoped>
+.rating-chip :deep(.v-chip__content) {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-block: 2px;
+}
+
+.rating-chip__score {
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+</style>
