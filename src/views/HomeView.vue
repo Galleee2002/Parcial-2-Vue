@@ -6,6 +6,7 @@ import {
   searchMovies,
   fetchGenres,
   discoverByGenre,
+  filterMoviesForUI,
 } from '@/services/tmdb'
 import AppContainer from '@/components/AppContainer.vue'
 import MovieCard from '@/components/MovieCard.vue'
@@ -37,12 +38,12 @@ function setError(err) {
 
 async function loadPopular() {
   const data = await fetchPopularMovies()
-  movies.value = data.results ?? []
+  movies.value = filterMoviesForUI(data.results)
 }
 
 async function loadTopMovies() {
   const data = await fetchPopularMovies()
-  topMovies.value = (data.results ?? []).slice(0, 10)
+  topMovies.value = filterMoviesForUI(data.results).slice(0, 10)
 }
 
 async function loadGenres() {
@@ -62,13 +63,13 @@ async function refreshMovies() {
     const query = String(searchQuery.value ?? '').trim()
     if (query) {
       const data = await searchMovies(query)
-      movies.value = data.results ?? []
+      movies.value = filterMoviesForUI(data.results)
       return
     }
 
     if (selectedGenre.value != null) {
       const data = await discoverByGenre(selectedGenre.value)
-      movies.value = data.results ?? []
+      movies.value = filterMoviesForUI(data.results)
       return
     }
 

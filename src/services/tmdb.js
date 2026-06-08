@@ -7,6 +7,16 @@ const PROVIDER_LOGO_BASE = 'https://image.tmdb.org/t/p/w92'
 /** Región ISO 3166-1 por defecto para plataformas de streaming */
 export const DEFAULT_WATCH_REGION = 'AR'
 
+/** Película con sinopsis localizada (es-ES); sin overview suele indicar título sin traducir */
+export function hasLocalizedOverview(movie) {
+  return Boolean(String(movie?.overview ?? '').trim())
+}
+
+/** Excluye películas sin descripción en español para la UI */
+export function filterMoviesForUI(movies) {
+  return (movies ?? []).filter(hasLocalizedOverview)
+}
+
 /** Construye URL de imagen de póster */
 export function posterUrl(posterPath) {
   if (!posterPath) return null
