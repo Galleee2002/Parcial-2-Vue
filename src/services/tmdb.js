@@ -176,14 +176,58 @@ export function providersForRegion(watchData, region = DEFAULT_WATCH_REGION) {
 
 /** Requisito 4 — filtro por género (discover) */
 export function discoverByGenre(genreId, page = 1) {
-  return tmdbGet('/discover/movie', {
-    with_genres: genreId,
+  return discoverMovies({ genreId, page })
+}
+
+/**
+ * Requisito 4 — discover con filtros opcionales (género y/o clasificación por edades).
+ * TMDB exige `certification_country` junto con `certification`.
+ */
+export function discoverMovies(
+  { genreId, certification, region = DEFAULT_WATCH_REGION, page = 1 } = {},
+) {
+  const params = {
     page,
     sort_by: 'popularity.desc',
-  })
+  }
+
+  if (genreId != null && genreId !== '') {
+    params.with_genres = genreId
+  }
+
+  if (certification) {
+    params.certification_country = region
+    params.certification = certification
+  }
+
+  return tmdbGet('/discover/movie', params)
+}
+
+/** Requisito 4 — filtro por clasificación por edades (discover) */
+export function discoverByCertification(certification, region = DEFAULT_WATCH_REGION, page = 1) {
+  return discoverMovies({ certification, region, page })
 }
 
 /** Lista de géneros para el v-select */
 export function fetchGenres() {
   return tmdbGet('/genre/movie/list')
+}
+
+/** Lista de clasificaciones por edades (todas las regiones) */
+export function fetchMovieCertifications() {
+  return tmdbGet('/certification/movie/list')
+}
+
+/** Opciones de v-select para clasificación en una región (p. ej. AR) */
+export function certificationsForRegion(certData, region = DEFAULT_WATCH_REGION) {
+  const items = certData?.certifications?.[region] ?? []
+
+  return items
+    .slice()
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+    .map((entry) => ({
+      title: entry.certification,
+      value: entry.certification,
+      subtitle: entry.meaning,
+    }))
 }

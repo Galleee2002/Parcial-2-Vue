@@ -1,15 +1,32 @@
-const DB_NAME = 'tmdb_favorites_db'
-const DB_VERSION = 1
-const STORE_NAME = 'favorites'
+const STORAGE_KEY = 'tmdb_favorites'
 
 /** @typedef {{ id: number, title: string, poster_path: string | null, release_date: string | null, overview: string, addedAt: string }} FavoriteRecord */
 
-let dbPromise = null
-
-function assertIndexedDb() {
-  if (typeof indexedDB === 'undefined') {
-    throw new Error('IndexedDB no está disponible en este entorno')
+function assertLocalStorage() {
+  if (typeof localStorage === 'undefined') {
+    throw new Error('localStorage no está disponible en este entorno')
   }
+}
+
+/** @returns {FavoriteRecord[]} */
+function readAllSync() {
+  assertLocalStorage()
+
+  const raw = localStorage.getItem(STORAGE_KEY)
+  if (!raw) return []
+
+  try {
+    const parsed = JSON.parse(raw)
+    return Array.isArray(parsed) ? parsed : []
+  } catch {
+    return []
+  }
+}
+
+/** @param {FavoriteRecord[]} list */
+function writeAllSync(list) {
+  assertLocalStorage()
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(list))
 }
 
 /**
@@ -28,70 +45,11 @@ export function toFavoriteRecord(movie) {
   }
 }
 
-function openFavoritesDb() {
-  assertIndexedDb()
-
-  if (!dbPromise) {
-    dbPromise = new Promise((resolve, reject) => {
-      const request = indexedDB.open(DB_NAME, DB_VERSION)
-
-      request.onupgradeneeded = () => {
-        const db = request.result
-        if (!db.objectStoreNames.contains(STORE_NAME)) {
-          db.createObjectStore(STORE_NAME, { keyPath: 'id' })
-        }
-      }
-
-      request.onsuccess = () => resolve(request.result)
-      request.onerror = () => reject(request.error ?? new Error('No se pudo abrir IndexedDB'))
-    })
-  }
-
-  return dbPromise
-}
-
-/**
- * @template T
- * @param {IDBTransactionMode} mode
- * @param {(store: IDBObjectStore) => T | Promise<T>} callback
- * @returns {Promise<T>}
- */
-async function withStore(mode, callback) {
-  const db = await openFavoritesDb()
-
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, mode)
-    const store = tx.objectStore(STORE_NAME)
-    let result
-
-    Promise.resolve(callback(store))
-      .then((value) => {
-        result = value
-      })
-      .catch((err) => {
-        tx.abort()
-        reject(err)
-      })
-
-    tx.oncomplete = () => resolve(result)
-    tx.onerror = () => reject(tx.error ?? new Error('Error en transacción IndexedDB'))
-    tx.onabort = () => reject(tx.error ?? new Error('Transacción IndexedDB abortada'))
-  })
-}
-
-function requestToPromise(request) {
-  return new Promise((resolve, reject) => {
-    request.onsuccess = () => resolve(request.result)
-    request.onerror = () => reject(request.error ?? new Error('Operación IndexedDB fallida'))
-  })
-}
-
 /** @returns {Promise<FavoriteRecord[]>} */
 export function getAllFavorites() {
-  return withStore('readonly', async (store) => {
-    const list = /** @type {FavoriteRecord[]} */ (await requestToPromise(store.getAll()))
-    return list.sort((a, b) => b.addedAt.localeCompare(a.addedAt))
-  })
+  return Promise.resolve(
+    readAllSync().sort((a, b) => b.addedAt.localeCompare(a.addedAt)),
+  )
 }
 
 /**
@@ -104,12 +62,13 @@ export function addFavorite(movie) {
     return Promise.reject(new Error('La película no tiene un id válido'))
   }
 
-  return withStore('readwrite', async (store) => {
-    const existing = await requestToPromise(store.get(id))
-    if (existing) return
+  const list = readAllSync()
+  if (list.some((item) => item.id === id)) {
+    return Promise.resolve()
+  }
 
-    await requestToPromise(store.put(toFavoriteRecord(movie)))
-  })
+  writeAllSync([...list, toFavoriteRecord(movie)])
+  return Promise.resolve()
 }
 
 /**
@@ -117,7 +76,8 @@ export function addFavorite(movie) {
  * @returns {Promise<void>}
  */
 export function removeFavorite(id) {
-  return withStore('readwrite', (store) => requestToPromise(store.delete(id)))
+  writeAllSync(readAllSync().filter((item) => item.id !== id))
+  return Promise.resolve()
 }
 
 /**
@@ -125,10 +85,12 @@ export function removeFavorite(id) {
  * @returns {Promise<boolean>}
  */
 export function isFavorite(id) {
-  return withStore('readonly', async (store) => Boolean(await requestToPromise(store.get(id))))
+  return Promise.resolve(readAllSync().some((item) => item.id === id))
 }
 
 /** @returns {Promise<void>} */
 export function clearFavorites() {
-  return withStore('readwrite', (store) => requestToPromise(store.clear()))
+  assertLocalStorage()
+  localStorage.removeItem(STORAGE_KEY)
+  return Promise.resolve()
 }

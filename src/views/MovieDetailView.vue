@@ -213,7 +213,7 @@ onMounted(() => {
                 size="large"
                 @click="onToggleList"
               >
-                {{ isInList ? 'Quitar de Mi Lista' : 'Agregar a Mi Lista' }}
+                {{ isInList ? 'Quitar de favoritos' : 'Agregar a favoritos' }}
               </v-btn>
               <v-btn
                 color="grey-lighten-1"

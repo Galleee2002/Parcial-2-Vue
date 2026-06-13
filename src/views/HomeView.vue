@@ -5,8 +5,11 @@ import {
   fetchPopularMovies,
   searchMovies,
   fetchGenres,
-  discoverByGenre,
+  fetchMovieCertifications,
+  certificationsForRegion,
+  discoverMovies,
   filterMoviesForUI,
+  DEFAULT_WATCH_REGION,
 } from '@/services/tmdb'
 import AppContainer from '@/components/AppContainer.vue'
 import MovieCard from '@/components/MovieCard.vue'
@@ -23,6 +26,7 @@ const movies = ref([])
 const topMovies = ref([])
 const genres = ref([])
 const selectedGenre = ref(null)
+const selectedCertification = ref(null)
 const loading = ref(true)
 const error = ref(null)
 
@@ -31,6 +35,7 @@ const showLeftFade = ref(false)
 const showRightFade = ref(false)
 
 const genreOptions = ref([])
+const certificationOptions = ref([])
 
 function setError(err) {
   error.value = err instanceof Error ? err.message : 'Error al cargar películas'
@@ -55,6 +60,11 @@ async function loadGenres() {
   }))
 }
 
+async function loadCertifications() {
+  const data = await fetchMovieCertifications()
+  certificationOptions.value = certificationsForRegion(data, DEFAULT_WATCH_REGION)
+}
+
 async function refreshMovies() {
   loading.value = true
   error.value = null
@@ -67,8 +77,15 @@ async function refreshMovies() {
       return
     }
 
-    if (selectedGenre.value != null) {
-      const data = await discoverByGenre(selectedGenre.value)
+    const hasGenreFilter = selectedGenre.value != null
+    const hasCertificationFilter = Boolean(selectedCertification.value)
+
+    if (hasGenreFilter || hasCertificationFilter) {
+      const data = await discoverMovies({
+        genreId: selectedGenre.value,
+        certification: selectedCertification.value,
+        region: DEFAULT_WATCH_REGION,
+      })
       movies.value = filterMoviesForUI(data.results)
       return
     }
@@ -87,6 +104,10 @@ async function onSearch() {
 }
 
 async function onGenreChange() {
+  await refreshMovies()
+}
+
+async function onCertificationChange() {
   await refreshMovies()
 }
 
@@ -130,7 +151,13 @@ onMounted(async () => {
   error.value = null
 
   try {
-    await Promise.all([loadTopMovies(), loadGenres(), loadPopular(), loadFavorites()])
+    await Promise.all([
+      loadTopMovies(),
+      loadGenres(),
+      loadCertifications(),
+      loadPopular(),
+      loadFavorites(),
+    ])
   } catch (err) {
     setError(err)
     movies.value = []
@@ -155,7 +182,7 @@ onUnmounted(() => {
       <div class="home-filters__intro">
         <h1 class="text-h4 text-grey-lighten-5">Películas populares</h1>
         <p class="text-body-1 text-grey-lighten-3">
-          Buscá películas por título, filtrá por género y agregá tus favoritas a Mi Lista.
+          Buscá películas por título, filtrá por género o clasificación por edades y agregá tus favoritas.
         </p>
       </div>
 
@@ -173,10 +200,10 @@ onUnmounted(() => {
         @click:clear="onSearch"
       />
 
-      <div class="home-filters__genre-wrap">
+      <div class="home-filters__controls">
         <v-select
           v-model="selectedGenre"
-          class="home-filters__genre"
+          class="home-filters__select"
           :items="genreOptions"
           item-title="title"
           item-value="value"
@@ -190,6 +217,25 @@ onUnmounted(() => {
           clearable
           @update:model-value="onGenreChange"
           @click:clear="onGenreChange"
+        />
+
+        <v-select
+          v-model="selectedCertification"
+          class="home-filters__select"
+          :items="certificationOptions"
+          item-title="title"
+          item-value="value"
+          item-subtitle="subtitle"
+          label="Clasificación"
+          placeholder="Todas las edades"
+          prepend-inner-icon="mdi-account-child-outline"
+          variant="outlined"
+          color="primary"
+          density="comfortable"
+          hide-details
+          clearable
+          @update:model-value="onCertificationChange"
+          @click:clear="onCertificationChange"
         />
       </div>
     </section>
@@ -290,13 +336,14 @@ onUnmounted(() => {
   margin-bottom: 0;
 }
 
-.home-filters__genre-wrap {
+.home-filters__controls {
   display: flex;
-  justify-content: flex-start;
+  flex-direction: column;
+  gap: 12px;
   width: 100%;
 }
 
-.home-filters__genre {
+.home-filters__select {
   width: 100%;
   max-width: 100%;
 }
@@ -315,22 +362,25 @@ onUnmounted(() => {
     min-width: 0;
   }
 
-  .home-filters__genre-wrap {
+  .home-filters__controls {
     flex: 0 0 auto;
+    flex-direction: row;
+    flex-wrap: wrap;
     justify-content: flex-end;
     width: auto;
+    gap: 12px 16px;
   }
 
-  .home-filters__genre {
-    min-width: 220px;
-    max-width: 280px;
+  .home-filters__select {
+    min-width: 200px;
+    max-width: 240px;
   }
 }
 
 @media (min-width: 960px) {
-  .home-filters__genre {
-    min-width: 260px;
-    max-width: 320px;
+  .home-filters__select {
+    min-width: 220px;
+    max-width: 260px;
   }
 }
 

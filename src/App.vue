@@ -1,17 +1,29 @@
 <script setup>
+import AppFooter from '@/components/AppFooter.vue'
 import NavBar from '@/components/NavBar.vue'
 </script>
 
 <template>
-  <v-app>
+  <v-app class="app-shell">
     <NavBar />
     <v-main>
       <RouterView />
     </v-main>
+    <AppFooter />
   </v-app>
 </template>
 
 <style>
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-shell .v-main {
+  flex: 1 1 auto;
+}
+
 /* Foco de inputs: solo ámbar del tema (primary), sin rojo de paleta anterior */
 .v-theme--moviesDark .v-field--focused:not(.v-field--error) .v-field__outline {
   color: rgb(var(--v-theme-primary));

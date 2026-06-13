@@ -19,7 +19,7 @@ onMounted(() => {
 
 <template>
   <AppContainer>
-    <h1 class="text-h4 text-grey-lighten-5 mb-4">Mi Lista</h1>
+    <h1 class="text-h4 text-grey-lighten-5 mb-4">Favoritos</h1>
 
     <div v-if="loading" class="d-flex justify-center py-12">
       <v-progress-circular indeterminate color="amber" size="48" />
@@ -38,7 +38,7 @@ onMounted(() => {
         type="info"
         variant="tonal"
         color="grey"
-        text="Todavía no agregaste películas a Mi Lista."
+        text="Todavía no agregaste películas a favoritos."
         class="mb-6"
       />
 

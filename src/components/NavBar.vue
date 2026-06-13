@@ -67,7 +67,9 @@ function toggleDrawer() {
           <v-btn
             :to="{ name: 'home' }"
             variant="text"
+            rounded="lg"
             :size="navBtnSize"
+            class="nav-link-btn"
             :class="route.path === '/' ? 'text-amber-accent-2' : 'text-grey-lighten-5'"
           >
             Inicio
@@ -76,10 +78,12 @@ function toggleDrawer() {
           <v-btn
             :to="{ name: 'favorites' }"
             variant="text"
+            rounded="lg"
             :size="navBtnSize"
+            class="nav-link-btn"
             :class="route.path === '/favorites' ? 'text-amber-accent-2' : 'text-grey-lighten-5'"
           >
-            Mi Lista
+            Favoritos
           </v-btn>
         </nav>
 
@@ -118,7 +122,7 @@ function toggleDrawer() {
       />
       <v-list-item
         :to="{ name: 'favorites' }"
-        title="Mi Lista"
+        title="Favoritos"
         prepend-icon="mdi-heart-outline"
         :active="route.path === '/favorites'"
         color="amber"
@@ -184,6 +188,16 @@ function toggleDrawer() {
   margin-left: auto;
   padding-left: 16px;
   gap: 4px;
+}
+
+.nav-actions :deep(.nav-link-btn) {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.nav-actions :deep(.nav-link-btn .v-btn__overlay),
+.nav-actions :deep(.nav-link-btn .v-btn__underlay) {
+  border-radius: inherit;
 }
 
 .nav-menu-btn {

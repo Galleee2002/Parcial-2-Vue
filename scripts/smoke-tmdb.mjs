@@ -41,6 +41,15 @@ try {
   const discover = await tmdb.discoverByGenre(28)
   console.assert(discover.results?.length > 0, 'discoverByGenre: sin results')
 
+  const certs = await tmdb.fetchMovieCertifications()
+  console.assert(certs.certifications?.AR?.length > 0, 'fetchMovieCertifications: sin AR')
+
+  const certOptions = tmdb.certificationsForRegion(certs, 'AR')
+  console.assert(certOptions.length > 0, 'certificationsForRegion: sin opciones')
+
+  const discoverCert = await tmdb.discoverByCertification('ATP', 'AR')
+  console.assert(discoverCert.results?.length > 0, 'discoverByCertification: sin results')
+
   const detail = await tmdb.fetchMovieDetails(11)
   console.assert(detail.title && detail.overview && detail.release_date, 'fetchMovieDetails: campos faltantes')
   console.assert('tagline' in detail, 'fetchMovieDetails: sin tagline')
@@ -74,7 +83,7 @@ try {
     'certificationForRegion',
   )
 
-  console.log('OK: smoke test TMDB pasó (6 endpoints + helpers)')
+  console.log('OK: smoke test TMDB pasó (endpoints + helpers)')
 } finally {
   await server.close()
 }

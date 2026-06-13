@@ -64,7 +64,7 @@ async function onToggleList() {
         size="small"
         @click="onToggleList"
       >
-        {{ isInList ? 'Quitar de Mi Lista' : 'Agregar a Mi Lista' }}
+        {{ isInList ? 'Quitar de favoritos' : 'Agregar a favoritos' }}
       </v-btn>
     </v-card-actions>
   </v-card>
