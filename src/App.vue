@@ -21,7 +21,7 @@ import NavBar from '@/components/NavBar.vue'
 }
 
 .app-shell .v-main {
-  flex: 1 1 auto;
+  flex: 0 1 auto;
 }
 
 /* Foco de inputs: solo ámbar del tema (primary), sin rojo de paleta anterior */

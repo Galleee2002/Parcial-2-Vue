@@ -34,7 +34,7 @@ const currentYear = computed(() => new Date().getFullYear())
               The Movie Database (TMDB)
             </a>
           </p>
-          <p class="text-caption text-grey mb-0 mt-2">
+          <p class="text-caption text-grey mb-0 app-footer__copyright">
             © {{ currentYear }} Ugi's Movies
           </p>
         </div>
@@ -46,11 +46,17 @@ const currentYear = computed(() => new Date().getFullYear())
 <style scoped>
 .app-footer {
   border-top: thin solid rgb(var(--v-theme-secondary));
-  margin-top: auto;
+  flex: 0 0 auto !important;
+  align-items: stretch !important;
+  flex-shrink: 0;
+  padding: 0 !important;
+  height: auto !important;
+  min-height: 0 !important;
 }
 
 .app-footer__shell {
   width: 100%;
+  margin: 0;
   padding-block: 24px;
 }
 
@@ -110,7 +116,17 @@ const currentYear = computed(() => new Date().getFullYear())
   color: rgb(var(--v-theme-warning));
 }
 
-@media (min-width: 600px) {
+.app-footer__meta p:last-child {
+  margin-top: 8px;
+}
+
+@media (min-width: 600px) and (max-width: 959px) {
+  .app-footer__meta {
+    text-align: start;
+  }
+}
+
+@media (min-width: 960px) {
   .app-footer__shell {
     padding-block: 32px;
   }
@@ -119,18 +135,12 @@ const currentYear = computed(() => new Date().getFullYear())
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: start;
-    gap: 32px;
+    gap: 48px;
   }
 
   .app-footer__meta {
     text-align: right;
     justify-self: end;
-  }
-}
-
-@media (min-width: 960px) {
-  .app-footer__grid {
-    gap: 48px;
   }
 }
 </style>

@@ -348,7 +348,36 @@ onUnmounted(() => {
   max-width: 100%;
 }
 
-@media (min-width: 600px) {
+@media (min-width: 600px) and (max-width: 959px) {
+  .home-filters {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .home-filters__intro {
+    width: 100%;
+    text-align: start;
+  }
+
+  .home-filters__controls {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    gap: 16px;
+  }
+
+  .home-filters__select {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+    max-width: 240px;
+  }
+}
+
+@media (min-width: 960px) {
   .home-filters {
     flex-direction: row;
     flex-wrap: wrap;
@@ -371,13 +400,6 @@ onUnmounted(() => {
     gap: 12px 16px;
   }
 
-  .home-filters__select {
-    min-width: 200px;
-    max-width: 240px;
-  }
-}
-
-@media (min-width: 960px) {
   .home-filters__select {
     min-width: 220px;
     max-width: 260px;

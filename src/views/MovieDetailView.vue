@@ -119,7 +119,7 @@ onMounted(() => {
 
       <div class="detail-hero__inner">
         <v-row class="detail-hero__row" align="start">
-          <v-col cols="12" md="4" class="detail-hero__poster-col">
+          <v-col cols="12" sm="6" md="4" class="detail-hero__poster-col">
             <v-img
               v-if="posterSrc"
               :src="posterSrc"
@@ -130,60 +130,53 @@ onMounted(() => {
             />
           </v-col>
 
-          <v-col cols="12" md="8" class="detail-hero__content-col">
-            <div class="detail-header">
-              <h1 class="detail-title">
-                <span class="text-grey-lighten-5">{{ displayTitle }}</span
-                ><span v-if="releaseYearLabel" class="detail-title__year text-grey-lighten-1">
-                  ({{ releaseYearLabel }})</span
-                >
-              </h1>
-
-              <p
-                v-if="hasFacts || voteAverage != null"
-                class="detail-facts text-body-2 text-grey-lighten-5"
+          <v-col cols="12" sm="6" md="8" class="detail-hero__content-col">
+            <h1 class="detail-title">
+              <span class="text-grey-lighten-5">{{ displayTitle }}</span
+              ><span v-if="releaseYearLabel" class="detail-title__year text-grey-lighten-1">
+                ({{ releaseYearLabel }})</span
               >
-                <span v-if="certification" class="detail-facts__cert text-grey-lighten-1">{{
-                  certification
-                }}</span>
-                <template v-if="genreNames">
-                  <span class="detail-facts__sep" aria-hidden="true"> • </span>
-                  <span>{{ genreNames }}</span>
-                </template>
-                <template v-if="runtimeLabel">
-                  <span class="detail-facts__sep" aria-hidden="true"> • </span>
-                  <span>{{ runtimeLabel }}</span>
-                </template>
-                <template v-if="voteAverage != null">
-                  <span class="detail-facts__sep" aria-hidden="true"> • </span>
-                  <span
-                    class="detail-facts__rating"
-                    :aria-label="`Valoración ${voteAverage.toFixed(1)} de 10`"
-                  >
-                    <v-icon icon="mdi-star" color="amber" size="x-small" aria-hidden="true" />
-                    {{ voteAverage.toFixed(1) }}
-                  </span>
-                </template>
-              </p>
-            </div>
+            </h1>
+
+            <p
+              v-if="hasFacts || voteAverage != null"
+              class="detail-facts text-body-2 text-grey-lighten-5"
+            >
+              <span v-if="certification" class="detail-facts__cert text-grey-lighten-1">{{
+                certification
+              }}</span>
+              <template v-if="genreNames">
+                <span class="detail-facts__sep" aria-hidden="true"> • </span>
+                <span>{{ genreNames }}</span>
+              </template>
+              <template v-if="runtimeLabel">
+                <span class="detail-facts__sep" aria-hidden="true"> • </span>
+                <span>{{ runtimeLabel }}</span>
+              </template>
+              <template v-if="voteAverage != null">
+                <span class="detail-facts__sep" aria-hidden="true"> • </span>
+                <span
+                  class="detail-facts__rating"
+                  :aria-label="`Valoración ${voteAverage.toFixed(1)} de 10`"
+                >
+                  <v-icon icon="mdi-star" color="amber" size="x-small" aria-hidden="true" />
+                  {{ voteAverage.toFixed(1) }}
+                </span>
+              </template>
+            </p>
 
             <p v-if="tagline" class="detail-tagline text-body-2 text-grey-lighten-1">
               {{ tagline }}
             </p>
 
-            <section class="detail-section">
-              <h2 class="text-h6 text-grey-lighten-5">Descripción:</h2>
-              <p class="text-body-1 text-grey-lighten-3">
-                {{ movie.overview }}
-              </p>
-            </section>
+            <h2 class="text-h6 text-grey-lighten-5">Descripción:</h2>
+            <p class="text-body-1 text-grey-lighten-3">
+              {{ movie.overview }}
+            </p>
 
-            <section
-              v-if="watchProviders && watchProviders.flatrate.length > 0"
-              class="detail-section"
-            >
+            <template v-if="watchProviders && watchProviders.flatrate.length > 0">
               <h2 class="text-h6 text-grey-lighten-5">Disponible en streaming</h2>
-              <div class="d-flex flex-wrap ga-3">
+              <div class="d-flex flex-wrap detail-providers">
                 <div
                   v-for="provider in watchProviders.flatrate"
                   :key="provider.provider_id"
@@ -203,9 +196,9 @@ onMounted(() => {
                   </span>
                 </div>
               </div>
-            </section>
+            </template>
 
-            <div class="d-flex flex-column flex-sm-row ga-3">
+            <div class="detail-actions d-flex flex-column flex-sm-row">
               <v-btn
                 :color="isInList ? 'grey-lighten-1' : 'amber'"
                 :variant="isInList ? 'tonal' : 'flat'"
@@ -277,44 +270,79 @@ onMounted(() => {
   margin-bottom: 8px;
 }
 
+@media (max-width: 599px) {
+  .detail-hero__inner {
+    padding-inline: 0;
+  }
+
+  .detail-hero__row {
+    margin-inline: 0;
+  }
+
+  .detail-hero__poster-col {
+    padding: 0 !important;
+    margin: 0 0 8px;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .detail-hero__poster {
+    width: 100%;
+    max-width: none;
+    box-shadow: none;
+    border-radius: 0 !important;
+  }
+
+  .detail-hero__poster :deep(.v-responsive),
+  .detail-hero__poster :deep(.v-img__img) {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 0 !important;
+  }
+
+  .detail-hero__content-col {
+    padding-inline: 16px;
+    padding-top: 0 !important;
+  }
+}
+
 .detail-hero__content-col {
+  --detail-block-gap: 16px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  text-align: center;
+  gap: var(--detail-block-gap);
+  text-align: start;
 }
 
-.detail-section {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.detail-hero__content-col > :is(h1, p),
-.detail-header > :is(h1, p),
-.detail-section > :is(h1, h2, h3, h4, h5, h6, p) {
+.detail-hero__content-col > :is(h1, h2, p) {
   margin: 0;
 }
 
-.detail-header {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.detail-hero__poster {
-  width: min(100%, 240px);
-  aspect-ratio: 2 / 3;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+.detail-actions {
+  gap: var(--detail-block-gap);
+  width: 100%;
 }
 
-.detail-hero__content-col :is(.d-flex.flex-wrap.ga-3, .d-flex.flex-column.flex-sm-row) {
-  justify-content: center;
+.detail-providers {
+  gap: 12px;
+  justify-content: flex-start;
+}
+
+.detail-hero__content-col :is(.detail-providers, .detail-actions) {
+  justify-content: flex-start;
+}
+
+.detail-hero__poster {
+  width: 100%;
+  aspect-ratio: 2 / 3;
 }
 
 .detail-title {
   font-size: 1.5rem;
   font-weight: 400;
   line-height: 1.25;
+  width: 100%;
+  text-align: center;
 }
 
 .detail-tagline {
@@ -353,27 +381,48 @@ onMounted(() => {
   vertical-align: baseline;
 }
 
-@media (min-width: 600px) {
+@media (min-width: 600px) and (max-width: 959px) {
   .detail-hero {
-    padding-block: 28px 32px;
+    padding-block: 40px;
   }
 
-  .detail-hero__inner {
-    padding-inline: 24px;
+  .detail-hero__row {
+    align-items: flex-start !important;
   }
 
-  .detail-hero__poster {
-    width: min(100%, 280px);
+  .detail-hero__poster-col {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  .detail-hero__content-col {
+    --detail-block-gap: 24px;
+    gap: var(--detail-block-gap);
+  }
+
+  .detail-title {
+    font-size: 2.125rem;
+  }
+
+  .detail-hero__content-col .text-h6 {
+    font-size: 1.25rem !important;
+  }
+
+  .detail-hero__content-col .text-body-1 {
+    font-size: 1.0625rem;
+    line-height: 1.6;
+  }
+
+  .detail-facts,
+  .detail-tagline {
+    font-size: 1rem !important;
   }
 }
 
-@media (min-width: 960px) {
-  .detail-hero {
-    padding-block: 32px 48px;
-  }
-
+@media (min-width: 600px) {
   .detail-hero__inner {
-    padding-inline: 32px;
+    padding-inline: 24px;
   }
 
   .detail-hero__poster-col {
@@ -384,15 +433,44 @@ onMounted(() => {
   .detail-hero__poster {
     width: 100%;
     max-width: none;
+    border-radius: 8px !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  }
+
+  .detail-hero__poster :deep(.v-img__img) {
+    border-radius: 8px !important;
   }
 
   .detail-hero__content-col {
-    gap: 24px;
-    text-align: start;
+    padding-inline: 0;
+    --detail-block-gap: 20px;
+    gap: var(--detail-block-gap);
   }
 
-  .detail-hero__content-col :is(.d-flex.flex-wrap.ga-3, .d-flex.flex-column.flex-sm-row) {
-    justify-content: flex-start;
+  .detail-title {
+    text-align: start;
+    font-size: 1.75rem;
+  }
+}
+
+@media (min-width: 600px) and (max-width: 959px) {
+  .detail-hero__inner {
+    padding-inline: 16px;
+  }
+}
+
+@media (min-width: 960px) {
+  .detail-hero {
+    padding-block: 32px;
+  }
+
+  .detail-hero__inner {
+    padding-inline: 32px;
+  }
+
+  .detail-hero__content-col {
+    --detail-block-gap: 24px;
+    gap: var(--detail-block-gap);
   }
 
   .detail-title {
