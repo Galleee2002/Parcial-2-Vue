@@ -11,25 +11,25 @@ import router from './router'
 const moviesDarkTheme = {
   dark: true,
   colors: {
-    background: '#212121', // grey darken-4 — bg-app
-    surface: '#424242', // grey darken-3 — cards
-    'surface-bright': '#616161', // grey darken-2
+    background: '#212121',
+    surface: '#424242',
+    'surface-bright': '#616161',
     'surface-light': '#424242',
     'surface-variant': '#616161',
-    'on-surface': '#FAFAFA', // grey lighten-5 — text-primary
-    'on-surface-variant': '#BDBDBD', // grey lighten-1 — text-secondary
+    'on-surface': '#FAFAFA',
+    'on-surface-variant': '#BDBDBD',
     'on-background': '#FAFAFA',
-    primary: '#FFC107', // amber — CTAs y foco de inputs
+    primary: '#FFC107',
     'primary-darken-1': '#FFB300',
     'on-primary': '#212121',
     amber: '#FFC107',
     'amber-darken-1': '#FFB300',
-    secondary: '#9E9E9E', // grey base
+    secondary: '#9E9E9E',
     'secondary-darken-1': '#757575',
-    error: '#FF8F00', // amber darken-3
+    error: '#FF8F00',
     info: '#9E9E9E',
     success: '#9E9E9E',
-    warning: '#FFD740', // amber accent-2
+    warning: '#FFD740',
   },
   variables: {
     'border-color': '#757575',

@@ -24,7 +24,6 @@ import NavBar from '@/components/NavBar.vue'
   flex: 0 1 auto;
 }
 
-/* Foco de inputs: solo ámbar del tema (primary), sin rojo de paleta anterior */
 .v-theme--moviesDark .v-field--focused:not(.v-field--error) .v-field__outline {
   color: rgb(var(--v-theme-primary));
 }
@@ -36,7 +35,6 @@ import NavBar from '@/components/NavBar.vue'
   color: rgb(var(--v-theme-primary));
 }
 
-/* Botones secundarios: fondo tonal + borde visible */
 .card-btn-secondary {
   color: rgb(var(--v-theme-on-surface));
   font-weight: 500;

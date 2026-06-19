@@ -5,57 +5,47 @@ const POSTER_BASE = 'https://image.tmdb.org/t/p/w500'
 const BACKDROP_BASE = 'https://image.tmdb.org/t/p/w1280'
 const PROVIDER_LOGO_BASE = 'https://image.tmdb.org/t/p/w92'
 
-/** Región ISO 3166-1 por defecto para plataformas de streaming */
 export const DEFAULT_WATCH_REGION = 'AR'
 
-/** Película con sinopsis localizada (es-ES); sin overview suele indicar título sin traducir */
 export function hasLocalizedOverview(movie) {
   return Boolean(String(movie?.overview ?? '').trim())
 }
 
-/** Excluye películas sin descripción en español para la UI */
 export function filterMoviesForUI(movies) {
   return (movies ?? []).filter(hasLocalizedOverview)
 }
 
-/** Construye URL de imagen de póster */
 export function posterUrl(posterPath) {
   if (!posterPath) return null
   return `${POSTER_BASE}${posterPath}`
 }
 
-/** Construye URL de imagen de backdrop (fondo ancho) */
 export function backdropUrl(backdropPath) {
   if (!backdropPath) return null
   return `${BACKDROP_BASE}${backdropPath}`
 }
 
-/** Tagline localizado de una película; null si viene vacío */
 export function movieTagline(movie) {
   const tagline = String(movie?.tagline ?? '').trim()
   return tagline || null
 }
 
-/** Construye URL del logo de una plataforma (watch provider) */
 export function providerLogoUrl(logoPath) {
   if (!logoPath) return null
   return `${PROVIDER_LOGO_BASE}${logoPath}`
 }
 
-/** Año desde release_date (formato TMDB: YYYY-MM-DD) */
 export function releaseYear(releaseDate) {
   if (!releaseDate) return null
   return releaseDate.slice(0, 4)
 }
 
-/** Título con año: «Película (2026)» */
 export function titleWithYear(title, releaseDate) {
   const year = releaseYear(releaseDate)
   if (!title) return ''
   return year ? `${title} (${year})` : title
 }
 
-/** Duración en horas y minutos: «1 h 40 min», «45 min» */
 export function formatRuntime(minutes) {
   if (minutes == null || minutes <= 0) return null
   const hours = Math.floor(minutes / 60)
@@ -65,7 +55,6 @@ export function formatRuntime(minutes) {
   return `${hours} h ${mins} min`
 }
 
-/** Duración estilo TMDB: «1h 56m», «45m» */
 export function formatRuntimeShort(minutes) {
   if (minutes == null || minutes <= 0) return null
   const hours = Math.floor(minutes / 60)
@@ -75,7 +64,6 @@ export function formatRuntimeShort(minutes) {
   return `${hours}h ${mins}m`
 }
 
-/** Géneros unidos estilo TMDB: «Acción, Fantasía y Aventura» */
 export function formatGenresList(genres) {
   const names = (genres ?? []).map((genre) => genre.name).filter(Boolean)
   if (names.length === 0) return null
@@ -84,10 +72,6 @@ export function formatGenresList(genres) {
   return `${names.slice(0, -1).join(', ')} y ${names.at(-1)}`
 }
 
-/**
- * Clasificación por edades para una región (release_dates de TMDB).
- * Prioriza estreno teatral (type 3) y luego cualquier fecha con certification.
- */
 export function certificationForRegion(movie, region = DEFAULT_WATCH_REGION) {
   const country = movie?.release_dates?.results?.find((entry) => entry.iso_3166_1 === region)
   const dates = country?.release_dates ?? []
@@ -121,12 +105,10 @@ async function tmdbGet(path, params = {}) {
   return res.json()
 }
 
-/** Requisito 1 — películas populares */
 export function fetchPopularMovies(page = 1) {
   return tmdbGet('/movie/popular', { page })
 }
 
-/** Requisito 2 — búsqueda por título */
 export function searchMovies(query, page = 1) {
   const q = String(query ?? '').trim()
   if (!q) {
@@ -140,10 +122,6 @@ export function searchMovies(query, page = 1) {
   return tmdbGet('/search/movie', { query: q, page })
 }
 
-/**
- * Requisito 3 — detalle de película (incluye plataformas vía append_to_response).
- * Entre otros campos, la respuesta incluye `tagline` y `backdrop_path`.
- */
 export function fetchMovieDetails(id, watchRegion = DEFAULT_WATCH_REGION) {
   return tmdbGet(`/movie/${id}`, {
     append_to_response: 'watch/providers,release_dates',
@@ -151,15 +129,10 @@ export function fetchMovieDetails(id, watchRegion = DEFAULT_WATCH_REGION) {
   })
 }
 
-/** Plataformas donde ver la película (streaming, alquiler y compra) */
 export function fetchMovieWatchProviders(id, watchRegion = DEFAULT_WATCH_REGION) {
   return tmdbGet(`/movie/${id}/watch/providers`, { watch_region: watchRegion })
 }
 
-/**
- * Extrae proveedores por región desde la respuesta de watch/providers
- * o desde el objeto anidado en fetchMovieDetails (clave "watch/providers").
- */
 export function providersForRegion(watchData, region = DEFAULT_WATCH_REGION) {
   const payload = watchData?.['watch/providers'] ?? watchData
   const country = payload?.results?.[region]
@@ -174,15 +147,10 @@ export function providersForRegion(watchData, region = DEFAULT_WATCH_REGION) {
   }
 }
 
-/** Requisito 4 — filtro por género (discover) */
 export function discoverByGenre(genreId, page = 1) {
   return discoverMovies({ genreId, page })
 }
 
-/**
- * Requisito 4 — discover con filtros opcionales (género y/o clasificación por edades).
- * TMDB exige `certification_country` junto con `certification`.
- */
 export function discoverMovies(
   { genreId, certification, region = DEFAULT_WATCH_REGION, page = 1 } = {},
 ) {
@@ -203,22 +171,18 @@ export function discoverMovies(
   return tmdbGet('/discover/movie', params)
 }
 
-/** Requisito 4 — filtro por clasificación por edades (discover) */
 export function discoverByCertification(certification, region = DEFAULT_WATCH_REGION, page = 1) {
   return discoverMovies({ certification, region, page })
 }
 
-/** Lista de géneros para el v-select */
 export function fetchGenres() {
   return tmdbGet('/genre/movie/list')
 }
 
-/** Lista de clasificaciones por edades (todas las regiones) */
 export function fetchMovieCertifications() {
   return tmdbGet('/certification/movie/list')
 }
 
-/** Opciones de v-select para clasificación en una región (p. ej. AR) */
 export function certificationsForRegion(certData, region = DEFAULT_WATCH_REGION) {
   const items = certData?.certifications?.[region] ?? []
 

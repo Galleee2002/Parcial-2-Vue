@@ -406,7 +406,6 @@ onUnmounted(() => {
   }
 }
 
-/* Grid de películas (debajo del Top 10) — móvil */
 @media (max-width: 599px) {
   .movie-grid {
     padding-inline: 8px;

@@ -32,17 +32,13 @@ const displayTitle = computed(() => movie.value?.title ?? '')
 const releaseYearLabel = computed(() =>
   movie.value ? releaseYear(movie.value.release_date) : null,
 )
-const genreNames = computed(() =>
-  movie.value ? formatGenresList(movie.value.genres) : null,
-)
-const runtimeLabel = computed(() =>
-  movie.value ? formatRuntimeShort(movie.value.runtime) : null,
-)
+const genreNames = computed(() => (movie.value ? formatGenresList(movie.value.genres) : null))
+const runtimeLabel = computed(() => (movie.value ? formatRuntimeShort(movie.value.runtime) : null))
 const certification = computed(() =>
   movie.value ? certificationForRegion(movie.value, DEFAULT_WATCH_REGION) : null,
 )
-const hasFacts = computed(
-  () => Boolean(certification.value || genreNames.value || runtimeLabel.value),
+const hasFacts = computed(() =>
+  Boolean(certification.value || genreNames.value || runtimeLabel.value),
 )
 const voteAverage = computed(() => movie.value?.vote_average ?? null)
 const watchProviders = computed(() =>
@@ -461,7 +457,7 @@ onMounted(() => {
 
 @media (min-width: 960px) {
   .detail-hero {
-    padding-block: 32px;
+    padding-block: 20px;
   }
 
   .detail-hero__inner {
@@ -469,7 +465,7 @@ onMounted(() => {
   }
 
   .detail-hero__content-col {
-    --detail-block-gap: 24px;
+    --detail-block-gap: 16px;
     gap: var(--detail-block-gap);
   }
 
@@ -484,5 +480,4 @@ onMounted(() => {
     filter: blur(12px);
   }
 }
-
 </style>
